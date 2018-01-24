@@ -76,6 +76,15 @@ status=$(tmutil status);
 
 phase=$( echo "${status}" | grep BackupPhase | sed 's/.*\ =\ //' | sed 's/;.*//' )
 
+case "${phase}" in
+    'ThinningPostBackup')
+	phase='Finished: thinning backups'
+	;;
+    'ThinningPreBackup')
+	phase='Starting: thinning backups'
+	;;
+esac
+
 printf 'Status:\t\t%s\n' "${phase}"
 
 if echo "${status}" | grep -q 'Remaining' ; then
