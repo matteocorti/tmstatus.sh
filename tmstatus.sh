@@ -24,6 +24,34 @@ format_size(){
     done
 }
 
+days_since(){
+
+    start_date=$1
+
+    start=$(date -j -f "%Y-%m-%d-%H%M%S" "${start_date}" "+%s")
+
+    end=$(date -j '+%s')
+
+    seconds=$((end - start))
+    days=$(( seconds / 60 / 60 / 24 + 1))
+
+    echo "${days}"
+    
+}
+
+format_days_ago() {
+
+    days=$1
+
+    if [ "${days}" -eq 0 ] ; then
+	echo 'today'
+    elif [ "${days}" -eq 1 ] ; then
+	echo "${days} day ago"
+    else
+	echo "${days} days ago"
+    fi
+
+}
 
 printf "Backups "
 hostname
@@ -39,24 +67,17 @@ if tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.' ; th
     printf 'Number:\t\toffline\n'
 
 else
-    
-    printf 'Oldest:\t\t'
-    tmutil listbackups  | head -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
 
-    printf 'Last:\t\t'
-    tmutil latestbackup | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
+    days=$( days_since "$(tmutil listbackups | head -n 1 | sed 's/.*\///')" )
+    backup_date=$( tmutil listbackups  | head -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+    printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "$( format_days_ago "${days}" )"
 
-    start_date=$(tmutil listbackups | head -n 1 | sed 's/.*\///')
-    start=$(date -j -f "%Y-%m-%d-%H%M%S" "${start_date}" "+%s")
+    days=$( days_since "$( tmutil latestbackup | sed 's/.*\///' )" )
+    backup_date=$( tmutil latestbackup | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+    printf 'Last:\t\t%s (%s)\n' "${backup_date}" "$( format_days_ago "${days}" )"
 
-    end_date=$(tmutil latestbackup | sed 's/.*\///')
-    end=$(date -j -f "%Y-%m-%d-%H%M%S" "${end_date}" "+%s")
-
-    seconds=$((end - start))
-    days=$(( seconds / 60 / 60 / 24 + 1))
-    
     number=$( tmutil listbackups | wc -l | sed 's/\ //g' )
-    printf 'Number:\t\t%s (%s days)\n' "${number}" "${days}"
+    printf 'Number:\t\t%s\n' "${number}"
     
 fi
 
