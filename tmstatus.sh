@@ -33,7 +33,7 @@ days_since(){
     end=$(date -j '+%s')
 
     seconds=$((end - start))
-    days=$(( seconds / 60 / 60 / 24 + 1))
+    days=$(( seconds / 60 / 60 / 24 ))
 
     echo "${days}"
     

@@ -3,4 +3,4 @@
 	* tmstatus.sh: Corrected a bug in the phase detection. Prints the time remaining only when existing
 	* tmstatus.sh: Shows only the percentage if > 1%
 	* tmstatus.sh: Consolidated time span computation
-
+	* tmstatus.sh: Corrected time span computation
