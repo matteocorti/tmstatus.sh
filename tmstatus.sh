@@ -1,4 +1,15 @@
 #!/bin/sh
+#
+# tmstatus.sh
+#
+# A simple script to summarise the Time Machine backup status
+#
+# Copyright (c) 2018 Matteo Corti <matteo@corti.li>
+#
+# This module is free software; you can redistribute it and/or modify it
+# under the terms of the Apache Licese v2
+# See the LICENSE file for details.
+#
 
 format_size(){
     while read -r B ; do
