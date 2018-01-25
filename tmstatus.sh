@@ -115,7 +115,7 @@ else
 
 fi
 
-if echo "${status}" | grep -q '_raw_Percent' ; then
+if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-' ; then
     percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
     printf 'Percent:\t%s\n' "$percent";
 fi

@@ -1,4 +1,5 @@
 2018-01-25  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh: Corrected a bug in the phase detection. Prints the time remaining only when existing
+	* tmstatus.sh: Shows only the percentage if > 0.1%
 
