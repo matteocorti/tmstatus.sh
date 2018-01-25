@@ -74,7 +74,7 @@ fi
 
 status=$(tmutil status);
 
-if echo "${status}" | grep -q 'Remaining' ; then
+if echo "${status}" | grep -q 'BackupPhase' ; then
     
     phase=$( echo "${status}" | grep BackupPhase | sed 's/.*\ =\ //' | sed 's/;.*//' )
 
@@ -90,19 +90,24 @@ if echo "${status}" | grep -q 'Remaining' ; then
     printf 'Status:\t\t%s\n' "${phase}"
 
     echo;
-    secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed 's/;.*//');
 
-    now=$(date +'%s')
-    end=$(( now + secs ))
-    end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+    if echo "${status}" | grep -q  Remaining ; then
+	
+	secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed 's/;.*//');
 
-    if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
+	now=$(date +'%s')
+	end=$(( now + secs ))
 	end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
-    else
-	end_formatted=$( date -j -f '%s' $end +'%H:%M' )
-    fi
+
+	if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
+	    end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+	else
+	    end_formatted=$( date -j -f '%s' $end +'%H:%M' )
+	fi
     
-    printf 'Time remaining:\t%dh:%dm:%ds (finish by %s)\n' $((secs/3600)) $((secs%3600/60)) $((secs%60)) "${end_formatted}"
+	printf 'Time remaining:\t%dh:%dm:%ds (finish by %s)\n' $((secs/3600)) $((secs%3600/60)) $((secs%60)) "${end_formatted}"
+
+    fi
 	
 else
 
