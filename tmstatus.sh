@@ -44,7 +44,7 @@ format_days_ago() {
     days=$1
 
     if [ "${days}" -eq 0 ] ; then
-	echo 'today'
+	echo 'less than one day ago'
     elif [ "${days}" -eq 1 ] ; then
 	echo "${days} day ago"
     else
