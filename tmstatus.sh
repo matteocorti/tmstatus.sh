@@ -11,6 +11,8 @@
 # See the LICENSE file for details.
 #
 
+VERSION=1.0.1
+
 format_size(){
     while read -r B ; do
 	[ "$B" -lt 1024 ] && echo "${B}" B && break
@@ -116,6 +118,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    ;;
 	'ThinningPreBackup')
 	    phase='Starting: thinning backups'
+	    ;;
+	'DeletingOldBackups')
+	    phase='Deleting old backups'
 	    ;;
     esac
 

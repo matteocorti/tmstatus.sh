@@ -1,3 +1,7 @@
+2018-01-29  Matteo Corti  <matteo@corti.li>
+
+	* tmstatus.sh (status): better phase description
+
 2018-01-26  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh (format_days_ago): better description for <24h
