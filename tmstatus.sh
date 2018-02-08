@@ -64,11 +64,17 @@ echo
 
 if tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.' ; then
 
+    printf 'Time Machine (offline):\n'
     printf 'Oldest:\t\toffline\n'
     printf 'Last:\t\toffline\n'
     printf 'Number:\t\toffline\n'
 
 else
+
+    tm_mount_point=$( tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //' )
+    tm_total=$( df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g' )
+    tm_available=$( df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g' )
+    printf '%s: %s (%s available)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}"
 
     days=$( days_since "$(tmutil listbackups | head -n 1 | sed 's/.*\///')" )
     backup_date=$( tmutil listbackups  | head -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
@@ -80,7 +86,7 @@ else
 
     number=$( tmutil listbackups | wc -l | sed 's/\ //g' )
     printf 'Number:\t\t%s\n' "${number}"
-    
+        
 fi
 
 echo
@@ -90,6 +96,9 @@ echo
 
 if tmutil listlocalsnapshotdates / 2>&1 | grep -q '[0-9]' ; then
 
+    tm_total=$( df -H / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g' )
+    tm_available=$( df -H / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g' )
+    printf 'Local: %s (%s available)\n' "${tm_total}" "${tm_available}"
     printf 'Local oldest:\t'
     tmutil listlocalsnapshotdates / | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
 
