@@ -11,7 +11,8 @@
 # See the LICENSE file for details.
 #
 
-VERSION=1.0.1
+# shellcheck disable=SC2034
+VERSION=1.2.0
 
 format_size(){
     while read -r B ; do
