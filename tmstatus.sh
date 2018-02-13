@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.2.0
+VERSION=1.2.1
 
 format_size(){
     while read -r B ; do
@@ -132,6 +132,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	'DeletingOldBackups')
 	    phase='Deleting old backups'
 	    ;;
+	'MountingBackupVol')
+	    phase='Mounting backup volume'
+	    ;;	
     esac
 
     printf 'Status:\t\t%s\n' "${phase}"
