@@ -70,6 +70,10 @@ if tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.' ; th
     printf 'Last:\t\toffline\n'
     printf 'Number:\t\toffline\n'
 
+elif tmutil listbackups 2>&1 | grep -q 'No backups found for host.' ; then
+
+    printf 'Time Machine: no backups found\n'
+    
 else
 
     tm_mount_point=$( tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //' )

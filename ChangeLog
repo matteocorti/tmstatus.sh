@@ -1,3 +1,7 @@
+2018-02-11  Matteo Corti  <matteo@corti.li>
+
+	* tmstatus.sh: Handling first backup
+
 2018-02-08  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh: better phase descriptions
