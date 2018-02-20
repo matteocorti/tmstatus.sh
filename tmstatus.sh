@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.2.1
+VERSION=1.2.2
 
 format_size(){
     while read -r B ; do
@@ -149,17 +149,22 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	
 	secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed 's/;.*//');
 
-	now=$(date +'%s')
-	end=$(( now + secs ))
-	end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
-
-	if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
+	# sometimes the remaining time is negative (?)
+	if ! echo "${secs}" | grep -q '^"-' ; then
+	
+	    now=$(date +'%s')
+	    end=$(( now + secs ))
 	    end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
-	else
-	    end_formatted=$( date -j -f '%s' $end +'%H:%M' )
+	    
+	    if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
+		end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+	    else
+		end_formatted=$( date -j -f '%s' $end +'%H:%M' )
+	    fi
+	    
+	    printf 'Time remaining:\t%dh:%dm:%ds (finish by %s)\n' $((secs/3600)) $((secs%3600/60)) $((secs%60)) "${end_formatted}"
+
 	fi
-    
-	printf 'Time remaining:\t%dh:%dm:%ds (finish by %s)\n' $((secs/3600)) $((secs%3600/60)) $((secs%60)) "${end_formatted}"
 
     fi
 	
@@ -170,7 +175,11 @@ else
 fi
 
 if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-' ; then
-    percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
+    if echo "${status}" | grep -q '_raw_Percent" = 1;' ; then
+	percent='100%'
+    else
+	percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
+    fi
     printf 'Percent:\t%s\n' "$percent";
 fi
 

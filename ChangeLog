@@ -1,3 +1,7 @@
+2018-02-20  Matteo Corti  <matteo@corti.li>
+
+	* tmstatus.sh: Fixed the parsing of 100% completion and negative estimated duration
+
 2018-02-11  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh: Handling first backup
