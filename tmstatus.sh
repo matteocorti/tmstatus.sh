@@ -56,9 +56,7 @@ format_days_ago() {
 
 }
 
-printf "Backups "
-hostname
-echo
+printf "Backups (%s): %s\\n\\n" "$(date)" "$(hostname)"
 
 ##############################################################################
 # Backup statistics
