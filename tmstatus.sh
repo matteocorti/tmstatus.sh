@@ -56,7 +56,7 @@ format_days_ago() {
 
 }
 
-printf "Backups (%s): %s\\n\\n" "$(date)" "$(hostname)"
+printf "Backups %s\\n\\n" "$(hostname)"
 
 ##############################################################################
 # Backup statistics
@@ -187,4 +187,8 @@ if echo "${status}" | grep -q 'totalBytes' ; then
     printf 'Size:\t\t%s of %s\n' "$size" "$total_size";
 fi
     
+echo
+
+date
+
 echo
