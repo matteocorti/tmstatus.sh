@@ -84,13 +84,13 @@ else
     printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "$( format_days_ago "${days}" )"
 
     latestbackup="$( tmutil latestbackup )"
-    if echo "${lastestbackup}" | grep -q '[0-9]' ; then
-	# a date was returned
+    if echo "${latestbackup}" | grep -q '[0-9]' ; then
+	# a date was returned (should implement a better test)
 	days=$( days_since "$( tmutil latestbackup | sed 's/.*\///' )" )
 	backup_date=$( tmutil latestbackup | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
 	printf 'Last:\t\t%s (%s)\n' "${backup_date}" "$( format_days_ago "${days}" )"
     else
-	printf 'Last:\t\t%s\n' "${lastbackup}"
+	printf 'Last:\t\t%s\n' "${latestbackup}"
     fi
 
     number=$( tmutil listbackups | wc -l | sed 's/\ //g' )
