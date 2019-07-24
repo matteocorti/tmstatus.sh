@@ -56,6 +56,30 @@ format_days_ago() {
 
 }
 
+# adapted from https://unix.stackexchange.com/questions/27013/displaying-seconds-as-days-hours-mins-seconds
+format_timespan(){
+    t=$1
+
+    d=$((t/60/60/24))
+    h=$((t/60/60%24))
+    m=$((t/60%60))
+    s=$((t%60))
+
+    if [ $d -gt 0 ]; then
+            [ $d = 1 ] && printf "%d day " $d || printf "%d days " $d
+    fi
+    if [ $h -gt 0 ]; then
+            [ $h = 1 ] && printf "%d hour " $h || printf "%d hours " $h
+    fi
+    if [ $m -gt 0 ]; then
+            [ $m = 1 ] && printf "%d minute " $m || printf "%d minutes " $m
+    fi
+    if [ $s -gt 0 ]; then
+            [ $s = 1 ] && printf "%d second" $s || printf "%d seconds" $s
+    fi
+    printf '\n'
+}
+
 printf "Backups %s\\n\\n" "$(hostname)"
 
 ##############################################################################
@@ -159,6 +183,7 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    now=$(date +'%s')
 	    end=$(( now + secs ))
 	    end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+	    duration=$( format_timespan "${secs}" )
 	    
 	    if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
 		end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
@@ -166,8 +191,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 		end_formatted=$( date -j -f '%s' $end +'%H:%M' )
 	    fi
 	    
-	    printf 'Time remaining:\t%dh:%dm:%ds (finish by %s)\n' $((secs/3600)) $((secs%3600/60)) $((secs%60)) "${end_formatted}"
-
+	    printf 'Time remaining:\t%s (finish by %s)\n' "${duration}" "${end_formatted}"	    
+	    
+	    
 	fi
 
     fi
