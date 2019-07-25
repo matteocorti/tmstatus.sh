@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.2.2
+VERSION=1.2.3
 
 format_size(){
     while read -r B ; do
@@ -58,26 +58,27 @@ format_days_ago() {
 
 # adapted from https://unix.stackexchange.com/questions/27013/displaying-seconds-as-days-hours-mins-seconds
 format_timespan(){
-    t=$1
 
-    d=$((t/60/60/24))
-    h=$((t/60/60%24))
-    m=$((t/60%60))
-    s=$((t%60))
+    input_in_seconds=$1
 
-    if [ $d -gt 0 ]; then
-            [ $d = 1 ] && printf "%d day " $d || printf "%d days " $d
+    days=$((input_in_seconds/60/60/24))
+    hours=$((input_in_seconds/60/60%24))
+    minutes=$((input_in_seconds/60%60))
+    seconds=$((input_in_seconds%60))
+
+    if [ $days -gt 0 ]; then
+            [ $days = 1 ] && printf "%d day " "${days}" || printf "%d days " "${days}"
     fi
-    if [ $h -gt 0 ]; then
-            [ $h = 1 ] && printf "%d hour " $h || printf "%d hours " $h
+    if [ $hours -gt 0 ]; then
+            [ $hours = 1 ] && printf "%d hour " "${hours}" || printf "%d hours " "${hours}"
     fi
-    if [ $m -gt 0 ]; then
-            [ $m = 1 ] && printf "%d minute " $m || printf "%d minutes " $m
+    if [ $minutes -gt 0 ]; then
+            [ $minutes = 1 ] && printf "%d minute " "${minutes}" || printf "%d minutes " "${minutes}"
     fi
-    if [ $s -gt 0 ]; then
-            [ $s = 1 ] && printf "%d second" $s || printf "%d seconds" $s
+    if [ $seconds -gt 0 ]; then
+            [ $seconds = 1 ] && printf "%d second" "${seconds}" || printf "%d seconds" "${seconds}"
     fi
-    printf '\n'
+
 }
 
 printf "Backups %s\\n\\n" "$(hostname)"
