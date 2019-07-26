@@ -190,8 +190,12 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    else
 		end_formatted=$( date -j -f '%s' $end +'%H:%M' )
 	    fi
-	    
-	    printf 'Time remaining:\t%s (finish by %s)\n' "${duration}" "${end_formatted}"	    
+
+	    if [ "${secs}" -eq 0 ] ; then		
+		printf 'Time remaining:\tunknown (finishing)\n'
+	    else
+		printf 'Time remaining:\t%s (finish by %s)\n' "${duration}" "${end_formatted}"
+	    fi
 	    
 	    
 	fi
