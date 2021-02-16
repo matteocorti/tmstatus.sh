@@ -1,3 +1,7 @@
+2021-02-16  Matteo Corti  <matteo@corti.li>
+
+	* tmstatus.sh: Better phase naming
+
 2018-02-20  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh: Fixed the parsing of 100% completion and negative estimated duration
