@@ -16,13 +16,13 @@ VERSION=1.2.3
 
 format_size(){
     while read -r B ; do
-	[ "$B" -lt 1024 ] && echo "${B}" B && break
+	[ "${B}" -lt 1024 ] && echo "${B}" B && break
 	KB=$(((B+512)/1024))
-	[ "$KB" -lt 1024 ] && echo "${KB}" KB && break
+	[ "${KB}" -lt 1024 ] && echo "${KB}" KB && break
 	MB=$(((KB+512)/1024))
-	[ "$MB" -lt 1024 ] && echo "${MB}" MB && break
+	[ "${MB}" -lt 1024 ] && echo "${MB}" MB && break
 	GB=$(((MB+512)/1024))
-	[ "$GB" -lt 1024 ] && echo "${GB}" GB && break
+	[ "${GB}" -lt 1024 ] && echo "${GB}" GB && break
 	echo $(((GB+512)/1024)) TB
     done
 }
@@ -66,17 +66,17 @@ format_timespan(){
     minutes=$((input_in_seconds/60%60))
     seconds=$((input_in_seconds%60))
 
-    if [ $days -gt 0 ]; then
-            [ $days = 1 ] && printf "%d day " "${days}" || printf "%d days " "${days}"
+    if [ "${days}" -gt 0 ]; then
+            [ "${days}" = 1 ] && printf "%d day " "${days}" || printf "%d days " "${days}"
     fi
-    if [ $hours -gt 0 ]; then
-            [ $hours = 1 ] && printf "%d hour " "${hours}" || printf "%d hours " "${hours}"
+    if [ "${hours}" -gt 0 ]; then
+            [ "${hours}" = 1 ] && printf "%d hour " "${hours}" || printf "%d hours " "${hours}"
     fi
-    if [ $minutes -gt 0 ]; then
-            [ $minutes = 1 ] && printf "%d minute " "${minutes}" || printf "%d minutes " "${minutes}"
+    if [ "${minutes}" -gt 0 ]; then
+            [ "${minutes}" = 1 ] && printf "%d minute " "${minutes}" || printf "%d minutes " "${minutes}"
     fi
-    if [ $seconds -gt 0 ]; then
-            [ $seconds = 1 ] && printf "%d second" "${seconds}" || printf "%d seconds" "${seconds}"
+    if [ "${seconds}" -gt 0 ]; then
+            [ "${seconds}" = 1 ] && printf "%d second" "${seconds}" || printf "%d seconds" "${seconds}"
     fi
 
 }
@@ -88,10 +88,18 @@ printf "Backups %s\\n\\n" "$(hostname)"
 
 if tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.' ; then
 
-    printf 'Time Machine (offline):\n'
-    printf 'Oldest:\t\toffline\n'
-    printf 'Last:\t\toffline\n'
-    printf 'Number:\t\toffline\n'
+    if tmutil status 2>&1 | grep -q 'HealthCheckFsck' ; then
+        
+        printf 'Time Machine: no information available (performing backup verification)\n'
+        
+    else
+    
+        printf 'Time Machine (offline):\n'
+        printf 'Oldest:\t\toffline\n'
+        printf 'Last:\t\toffline\n'
+        printf 'Number:\t\toffline\n'
+
+    fi
 
 elif tmutil listbackups 2>&1 | grep -q 'No backups found for host.' ; then
 
@@ -176,7 +184,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    ;;
         'HealthCheckFsck')
             phase='Verifying backup'
-            ;;       
+            ;;
+        *)
+            ;;
     esac
 
     printf 'Status:\t\t%s\n' "${phase}"
@@ -192,13 +202,13 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	
 	    now=$(date +'%s')
 	    end=$(( now + secs ))
-	    end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+	    end_formatted=$( date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M' )
 	    duration=$( format_timespan "${secs}" )
 	    
-	    if [ "$(date -j -f '%s' $end +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
-		end_formatted=$( date -j -f '%s' $end +'%Y-%m-%d %H:%M' )
+	    if [ "$(date -j -f '%s' "${end}" +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ] ; then
+		end_formatted=$( date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M' )
 	    else
-		end_formatted=$( date -j -f '%s' $end +'%H:%M' )
+		end_formatted=$( date -j -f '%s' "${end}" +'%H:%M' )
 	    fi
 
 	    if [ "${secs}" -eq 0 ] ; then		
@@ -224,13 +234,13 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-' ; then
     else
 	percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
     fi
-    printf 'Percent:\t%s\n' "$percent";
+    printf 'Percent:\t%s\n' "${percent}";
 fi
 
 if echo "${status}" | grep -q 'totalBytes' ; then
     total_size=$(echo "${status}" | grep 'totalBytes\ \=' | sed 's/.*totalBytes\ \=\ //' | sed 's/;.*//' | format_size)
     size=$(echo "${status}" | grep 'bytes\ \=' | sed 's/.*bytes\ \=\ //' | sed 's/;.*//' | format_size)
-    printf 'Size:\t\t%s of %s\n' "$size" "$total_size";
+    printf 'Size:\t\t%s of %s\n' "${size}" "${total_size}";
 fi
     
 echo
