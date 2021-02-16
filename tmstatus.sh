@@ -174,6 +174,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	'SizingChanges')
 	    phase='Sizing changes'
 	    ;;
+        'HealthCheckFsck')
+            phase='Verifying backup'
+            ;;       
     esac
 
     printf 'Status:\t\t%s\n' "${phase}"
