@@ -167,7 +167,13 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    ;;
 	'MountingBackupVol')
 	    phase='Mounting backup volume'
-	    ;;	
+	    ;;
+	'FindingChanges')
+	    phase='Fining changes'
+	    ;;
+	'SizingChanges')
+	    phase='Sizing changes'
+	    ;;
     esac
 
     printf 'Status:\t\t%s\n' "${phase}"
