@@ -189,7 +189,7 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    phase='Preparing source volumes'
 	    ;;
         'MountingBackupVolForHealthCheck')
-            phase='Mounting backup volume for health check'
+            phase='Preparing verification'
             ;;
         *)
             ;;
