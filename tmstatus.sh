@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.2.3
+VERSION=1.2.4
 
 format_size(){
     while read -r B ; do
@@ -185,6 +185,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
         'HealthCheckFsck')
             phase='Verifying backup'
             ;;
+	'PreparingSourceVolumes')
+	    phase='Preparing source volumes'
+	    ;;
         *)
             ;;
     esac
