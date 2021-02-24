@@ -188,6 +188,9 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	'PreparingSourceVolumes')
 	    phase='Preparing source volumes'
 	    ;;
+        'MountingBackupVolForHealthCheck')
+            phase='Mounting backup volume for health check'
+            ;;
         *)
             ;;
     esac
