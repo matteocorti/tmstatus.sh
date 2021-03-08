@@ -177,7 +177,7 @@ if echo "${status}" | grep -q 'BackupPhase' ; then
 	    phase='Mounting backup volume'
 	    ;;
 	'FindingChanges')
-	    phase='Fining changes'
+	    phase='Finding changes'
 	    ;;
 	'SizingChanges')
 	    phase='Sizing changes'
