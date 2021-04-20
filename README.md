@@ -1,5 +1,5 @@
 
- (c) Matteo Corti, 2018
+ (c) Matteo Corti, 2018-2021
 
 # tmstatus.sh
 
