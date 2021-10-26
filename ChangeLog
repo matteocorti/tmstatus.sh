@@ -1,3 +1,7 @@
+2021-10-26  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Fix the processing of tmutils listbackups and latestbackup
+
 2021-04-20  Matteo Corti  <matteo@corti.li>
 
 	* tmstatus.sh: Verifying progress

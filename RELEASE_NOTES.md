@@ -1,1 +1,1 @@
-Show the progress of the verification step
+Fix the processing of tmutil output
