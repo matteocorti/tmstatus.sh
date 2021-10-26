@@ -14,8 +14,10 @@
 # shellcheck disable=SC2034
 VERSION=1.3.0
 
-format_size() {
-    while read -r B; do
+export LC_ALL=C
+
+format_size(){
+    while read -r B ; do
         [ "${B}" -lt 1024 ] && echo "${B}" B && break
         KB=$(((B + 512) / 1024))
         [ "${KB}" -lt 1024 ] && echo "${KB}" KB && break
