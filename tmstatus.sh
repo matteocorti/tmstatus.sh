@@ -115,7 +115,7 @@ else
     printf '%s: %s (%s available)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}"
 
     days=$(days_since "$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' )")
-    backup_date=$(tmutil listbackups | head -n 1 | sed 's/.*\///' |  | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+    backup_date=$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
     printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "$(format_days_ago "${days}")"
 
     latestbackup="$(tmutil latestbackup)"
