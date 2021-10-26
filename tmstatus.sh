@@ -14,6 +14,8 @@
 # shellcheck disable=SC2034
 VERSION=1.3.0
 
+export LC_ALL=C
+
 format_size(){
     while read -r B ; do
         [ "${B}" -lt 1024 ] && echo "${B}" B && break
