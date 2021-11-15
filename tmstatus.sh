@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.4.0
+VERSION=1.5.0
 
 export LC_ALL=C
 
@@ -83,12 +83,27 @@ format_timespan() {
 
 }
 
-printf 'Backups %s\n\n' "$(hostname)"
+HOSTNAME_TMP="$(hostname)"
+printf 'Backups %s\n\n' "${HOSTNAME_TMP}"
 
 ##############################################################################
 # Backup statistics
 
-if tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.'; then
+if tmutil listbackups 2>&1 | grep -q -F 'listbackups requires Full Disk Access privileges' ; then
+
+cat <<'EOF'
+Error:
+
+tmutil: listbackups requires Full Disk Access privileges.
+
+To allow this operation, select Full Disk Access in the Privacy
+tab of the Security & Privacy preference pane, and add Terminal
+to the list of applications which are allowed Full Disk Access.
+
+EOF
+    exit 1
+
+elif tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.'; then
 
     if tmutil status 2>&1 | grep -q 'HealthCheckFsck'; then
 
@@ -114,16 +129,20 @@ else
     tm_available=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
     printf '%s: %s (%s available)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}"
 
-    days=$(days_since "$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')")
+    DATE="$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
+    days="$(days_since "${DATE}")"
     backup_date=$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-    printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "$(format_days_ago "${days}")"
+    DAYS_AGO="$(format_days_ago "${days}")"
+    printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
     latestbackup="$(tmutil latestbackup)"
     if echo "${latestbackup}" | grep -q '[0-9]'; then
         # a date was returned (should implement a better test)
-        days=$(days_since "$(tmutil latestbackup | sed 's/.*\///' | sed 's/[.].*//')")
+        DATE="$(tmutil latestbackup | sed 's/.*\///' | sed 's/[.].*//')"
+        days=$(days_since "${DATE}")
         backup_date=$(tmutil latestbackup | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-        printf 'Last:\t\t%s (%s)\n' "${backup_date}" "$(format_days_ago "${days}")"
+        DAYS_AGO="$(format_days_ago "${days}")"
+        printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
     else
         printf 'Last:\t\t%s\n' "${latestbackup}"
     fi
@@ -202,18 +221,20 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     echo
 
     if echo "${status}" | grep -q Remaining; then
-
-        secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed 's/;.*//')
+        
+        secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed -e 's/.*\ =\ //' -e 's/;.*//' -e 's/^"//' -e 's/"$//' -e 's/[.].*//' )
 
         # sometimes the remaining time is negative (?)
         if ! echo "${secs}" | grep -q '^"-'; then
 
-            now=$(date +'%s')
+            now=$(date +'%s')            
             end=$((now + secs))
             end_formatted=$(date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M')
             duration=$(format_timespan "${secs}")
 
-            if [ "$(date -j -f '%s' "${end}" +'%Y-%m-%d')" != "$(date +'%Y-%m-%d')" ]; then
+            DATE1="$(date -j -f '%s' "${end}" +'%Y-%m-%d')"
+            DATE2="$(date +'%Y-%m-%d')"          
+            if [ "${DATE1}" != "${DATE2}" ]; then
                 end_formatted=$(date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M')
             else
                 end_formatted=$(date -j -f '%s' "${end}" +'%H:%M')

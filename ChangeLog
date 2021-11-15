@@ -1,3 +1,9 @@
+2021-11-15  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Error message if Full Disk Access is required
+        * tmstatus.sh: General cleanup with ShellCheck
+        * tmstatus.sh(status): Fixed the processing of the remaining time
+
 2021-10-26  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Fix the processing of tmutils listbackups and latestbackup
