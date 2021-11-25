@@ -212,6 +212,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     'MountingBackupVolForHealthCheck')
         phase='Preparing verification'
         ;;
+    'FindingBackupVol')
+        phase='Loolking for backup disk'
+        ;;
     *) ;;
 
     esac
