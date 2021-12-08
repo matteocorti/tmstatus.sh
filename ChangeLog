@@ -14,7 +14,7 @@
 
 2021-02-16  Matteo Corti  <matteo@corti.li>
 
-	* tmstatus.sh: Better phase naminge
+	* tmstatus.sh: Better phase naming
 	* tmstatus.sh: Better info when performing backup verification
 
 2018-02-20  Matteo Corti  <matteo@corti.li>
