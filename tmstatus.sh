@@ -89,9 +89,9 @@ printf 'Backups %s\n\n' "${HOSTNAME_TMP}"
 ##############################################################################
 # Backup statistics
 
-if tmutil listbackups 2>&1 | grep -q -F 'listbackups requires Full Disk Access privileges' ; then
+if tmutil listbackups 2>&1 | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
-cat <<'EOF'
+    cat <<'EOF'
 Error:
 
 tmutil: listbackups requires Full Disk Access privileges.
@@ -185,6 +185,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     phase=$(echo "${status}" | grep BackupPhase | sed 's/.*\ =\ //' | sed 's/;.*//')
 
     case "${phase}" in
+    'BackupNotRunning')
+        phase='Not running'
+        ;;
     'ThinningPostBackup')
         phase='Finished: thinning backups'
         ;;
@@ -206,6 +209,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     'HealthCheckFsck')
         phase='Verifying backup'
         ;;
+    'HealthCheckCopyHFSMeta')
+        phase='Verifying backup'
+        ;;
     'PreparingSourceVolumes')
         phase='Preparing source volumes'
         ;;
@@ -224,19 +230,19 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     echo
 
     if echo "${status}" | grep -q Remaining; then
-        
-        secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed -e 's/.*\ =\ //' -e 's/;.*//' -e 's/^"//' -e 's/"$//' -e 's/[.].*//' )
+
+        secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed -e 's/.*\ =\ //' -e 's/;.*//' -e 's/^"//' -e 's/"$//' -e 's/[.].*//')
 
         # sometimes the remaining time is negative (?)
         if ! echo "${secs}" | grep -q '^"-'; then
 
-            now=$(date +'%s')            
+            now=$(date +'%s')
             end=$((now + secs))
             end_formatted=$(date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M')
             duration=$(format_timespan "${secs}")
 
             DATE1="$(date -j -f '%s' "${end}" +'%Y-%m-%d')"
-            DATE2="$(date +'%Y-%m-%d')"          
+            DATE2="$(date +'%Y-%m-%d')"
             if [ "${DATE1}" != "${DATE2}" ]; then
                 end_formatted=$(date -j -f '%s' "${end}" +'%Y-%m-%d %H:%M')
             else
