@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.5.0
+VERSION=1.6.0
 
 export LC_ALL=C
 
@@ -227,6 +227,11 @@ if echo "${status}" | grep -q 'BackupPhase'; then
 
     printf 'Status:\t\t%s\n' "${phase}"
 
+    if echo "${status}" | grep -q 'totalBytes'; then
+        total_size=$(echo "${status}" | grep 'totalBytes\ \=' | sed 's/.*totalBytes\ \=\ //' | sed 's/;.*//' | format_size)
+        printf 'Backup size:\t%s\n' "${total_size}"
+    fi
+
     echo
 
     if echo "${status}" | grep -q Remaining; then
@@ -272,12 +277,17 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
         percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
     fi
     printf 'Percent:\t%s\n' "${percent}"
-fi
 
-if echo "${status}" | grep -q 'totalBytes'; then
-    total_size=$(echo "${status}" | grep 'totalBytes\ \=' | sed 's/.*totalBytes\ \=\ //' | sed 's/;.*//' | format_size)
-    size=$(echo "${status}" | grep 'bytes\ \=' | sed 's/.*bytes\ \=\ //' | sed 's/;.*//' | format_size)
-    printf 'Size:\t\t%s of %s\n' "${size}" "${total_size}"
+    raw_percent=$( echo "${status}" | grep '_raw_Percent' | sed 's/.*\ =\ "//' | sed 's/".*//')
+
+    if echo "${status}" | grep -q 'bytes'; then
+        size=$(echo "${status}" | grep 'bytes\ \=' | sed 's/.*bytes\ \=\ //' | sed 's/;.*//')
+        copied_size=$( echo "${size} / ${raw_percent}" | bc | format_size)
+        size=$(echo "${size}" | format_size)
+        printf 'Size:\t\t%s of %s\n' "${size}" "${copied_size}"
+    fi
+
+    
 fi
 
 # Print verifying status
