@@ -1,3 +1,7 @@
+2022-08-18  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (status): Parse LazyThinning
+
 2022-08-17  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: corrected the backup size (current backup & total size)

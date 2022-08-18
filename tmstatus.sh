@@ -188,38 +188,41 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     'BackupNotRunning')
         phase='Not running'
         ;;
+    'DeletingOldBackups')
+        phase='Deleting old backups'
+        ;;
+    'FindingBackupVol')
+        phase='Looking for backup disk'
+        ;;
+    'FindingChanges')
+        phase='Finding changes'
+        ;;
+    'HealthCheckCopyHFSMeta')
+        phase='Verifying backup'
+        ;;
+    'HealthCheckFsck')
+        phase='Verifying backup'
+        ;;
+    'LazyThinning')
+        phase='Lazy thinning'
+        ;;
+    'MountingBackupVol')
+        phase='Mounting backup volume'
+        ;;
+    'MountingBackupVolForHealthCheck')
+        phase='Preparing verification'
+        ;;
+    'PreparingSourceVolumes')
+        phase='Preparing source volumes'
+        ;;
+    'SizingChanges')
+        phase='Sizing changes'
+        ;;
     'ThinningPostBackup')
         phase='Finished: thinning backups'
         ;;
     'ThinningPreBackup')
         phase='Starting: thinning backups'
-        ;;
-    'DeletingOldBackups')
-        phase='Deleting old backups'
-        ;;
-    'MountingBackupVol')
-        phase='Mounting backup volume'
-        ;;
-    'FindingChanges')
-        phase='Finding changes'
-        ;;
-    'SizingChanges')
-        phase='Sizing changes'
-        ;;
-    'HealthCheckFsck')
-        phase='Verifying backup'
-        ;;
-    'HealthCheckCopyHFSMeta')
-        phase='Verifying backup'
-        ;;
-    'PreparingSourceVolumes')
-        phase='Preparing source volumes'
-        ;;
-    'MountingBackupVolForHealthCheck')
-        phase='Preparing verification'
-        ;;
-    'FindingBackupVol')
-        phase='Looking for backup disk'
         ;;
     *) ;;
 
