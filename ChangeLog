@@ -1,3 +1,7 @@
+2022-08-31  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Available space in %
+
 2022-08-18  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (status): Parse LazyThinning

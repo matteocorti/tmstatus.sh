@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.6.0
+VERSION=1.7.0
 
 export LC_ALL=C
 
@@ -125,10 +125,16 @@ elif tmutil listbackups 2>&1 | grep -q 'No backups found for host.'; then
 else
 
     tm_mount_point=$(tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //')
+
     tm_total=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
     tm_available=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-    printf '%s: %s (%s available)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}"
 
+    tm_total_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+    tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+    tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
+    
+    printf '%s: %s (%s available, %s%%)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
+    
     DATE="$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
     days="$(days_since "${DATE}")"
     backup_date=$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
@@ -161,7 +167,12 @@ if tmutil listlocalsnapshotdates / 2>&1 | grep -q '[0-9]'; then
 
     tm_total=$(df -H / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
     tm_available=$(df -H / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-    printf 'Local: %s (%s available)\n' "${tm_total}" "${tm_available}"
+
+    tm_total_raw=$(df / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+    tm_available_raw=$(df / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+    tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
+    
+    printf 'Local: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
     printf 'Local oldest:\t'
     tmutil listlocalsnapshotdates / | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
 

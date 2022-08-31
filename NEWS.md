@@ -1,3 +1,5 @@
+* 2022-08-31, Version 1.7.0
+  * Available space in %
 * 2022-08-17, Version 1.6.0
   * Corrected the backup size computation
 * 2021-11-15, Version 1.5.0
