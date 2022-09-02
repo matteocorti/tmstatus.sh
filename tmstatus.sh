@@ -84,7 +84,7 @@ format_timespan() {
 }
 
 HOSTNAME_TMP="$(hostname)"
-printf 'Backups %s\n\n' "${HOSTNAME_TMP}"
+printf 'Backups for "%s"\n\n' "${HOSTNAME_TMP}"
 
 ##############################################################################
 # Backup statistics
