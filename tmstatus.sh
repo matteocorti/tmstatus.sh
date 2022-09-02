@@ -252,10 +252,10 @@ if echo "${status}" | grep -q 'BackupPhase'; then
         printf 'Backup size:\t%s\n' "${total_size}"
     fi
 
-    echo
-
     if echo "${status}" | grep -q Remaining; then
 
+        echo
+        
         secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed -e 's/.*\ =\ //' -e 's/;.*//' -e 's/^"//' -e 's/"$//' -e 's/[.].*//')
 
         # sometimes the remaining time is negative (?)
