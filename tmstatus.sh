@@ -117,7 +117,7 @@ elif tmutil listbackups 2>&1 | grep -q 'No machine directory found for host.'; t
 
     else
 
-        printf 'Time Machine (offline):\n'
+        printf 'Time Machine (%s):\n' "${KIND}"
         printf 'Oldest:\t\toffline\n'
         printf 'Last:\t\toffline\n'
         printf 'Number:\t\toffline\n'
