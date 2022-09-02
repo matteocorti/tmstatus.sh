@@ -84,7 +84,11 @@ format_timespan() {
 }
 
 HOSTNAME_TMP="$(hostname)"
-printf 'Backups for "%s"\n\n' "${HOSTNAME_TMP}"
+KIND="$( tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"
+if [ "${KIND}" = "Local" ] ; then
+    KIND="Local disk"
+fi
+printf 'Backups for "%s" (%s)\n\n' "${HOSTNAME_TMP}" "${KIND}"
 
 ##############################################################################
 # Backup statistics
@@ -133,7 +137,7 @@ else
     tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
     tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
     
-    printf '%s: %s (%s available, %s%%)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
+    printf 'Volume "%s": %s (%s available, %s%%)\n' "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
     
     DATE="$(tmutil listbackups | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
     days="$(days_since "${DATE}")"
