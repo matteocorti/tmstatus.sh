@@ -1,3 +1,7 @@
+2023-01-30  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Refactoring: do not call the same tmutil command more than once
+
 2022-08-31  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Available space in %
