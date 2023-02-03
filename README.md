@@ -3,9 +3,7 @@
 
 &copy; Matteo Corti, 2018-2023
 
-A simple script to summarize the Time Machine backup status
-
-The script takes no arguments and shows a summary of status of Time Machine (on macOS)
+A simple script to summarize the Time Machine backup status.
 
 Sample output
 
