@@ -5,7 +5,7 @@
 
 A simple script to summarize the Time Machine backup status
 
-The script takes no arguments and shows the current status of Time Machine (on macOS)
+The script takes no arguments and shows a summary of status of Time Machine (on macOS)
 
 Sample output
 
