@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.7.0
+VERSION=1.8.0
 
 export LC_ALL=C
 
@@ -83,14 +83,44 @@ format_timespan() {
 
 }
 
+usage() {
+
+    echo
+    echo "Usage: tmstatus.sh [OPTIONS]"
+    echo
+    echo "Options:"
+    # Delimiter at 78 chars ############################################################
+    echo "   -h,--help,-?                    This help message"
+    echo "   -l,--log [lines]                Show the last log lines"
+    echo
+    echo "Report bugs to https://github.com/matteocorti/tmstatus.sh/issues"
+    echo
+
+    exit
+    
+}
+
 COMMAND_LINE_ARGUMENTS=$*
 
 while true; do
 
     case "$1" in
-        -l | --log)
-            SHOWLOG=1
-            shift
+        -h | --help)
+            usage
+            ;;
+        -l | --log)           
+            SHOWLOG=20
+            if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
+                if [ "${2%${2#?}}"x = '-x' ]; then
+                    shift
+                else
+                    SHOWLOG=$2
+                    shift 2
+                fi
+            else
+                shift
+            fi
             ;;
         *)
             if [ -n "$1" ]; then
@@ -380,7 +410,7 @@ if [ -n "${SHOWLOG}" ]; then
             -e 's/\[//' |
         expand -t 27 |
         cut -c -"${WIDTH}" |
-        tail -n 20
+        tail -n "${SHOWLOG}"
     
     printf '%.s-' $( seq 1 "$(tput cols)" )
     echo

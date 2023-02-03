@@ -1,3 +1,5 @@
+* 2023-02-03, Version 1.8.0
+  * Option to show the last log entries
 * 2022-08-31, Version 1.7.0
   * Available space in %
 * 2022-08-17, Version 1.6.0

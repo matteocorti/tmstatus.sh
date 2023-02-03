@@ -1,1 +1,1 @@
-Available space in %
+Option to show the last log entries
