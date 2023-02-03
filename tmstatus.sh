@@ -83,8 +83,26 @@ format_timespan() {
 
 }
 
-HOSTNAME_TMP="$(hostname)"
+COMMAND_LINE_ARGUMENTS=$*
 
+while true; do
+
+    case "$1" in
+        -l | --log)
+            SHOWLOG=1
+            shift
+            ;;
+        *)
+            if [ -n "$1" ]; then
+                echo "Error: unknown option: ${1}"
+            fi
+            break
+            ;;
+    esac
+
+done
+
+HOSTNAME_TMP="$(hostname)"
 printf 'Backups for "%s"\n\n' "${HOSTNAME_TMP}"
 
 ##############################################################################
@@ -324,44 +342,48 @@ fi
 
 echo
 
-echo "Last log entries:"
-echo
+if [ -n "${SHOWLOG}" ]; then
 
-WIDTH=$(tput cols)
+    echo "Last log entries:"
+    echo
 
-printf '%.s-' $( seq 1 "${WIDTH}" )
-echo
-# per default TM runs each hour: check the last 60 minutes
-log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
-    grep --line-buffered --invert \
-         --regexp '^Timestamp' \
-         --regexp  'TMPowerState: [0-9]' \
-         --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
-         --regexp 'com.apple.backupd.*.xpc: connection invalid' \
-         --regexp 'Skipping scheduled' \
-         --regexp 'Failed to find a disk' \
-         --regexp 'notifyd ' \
-         --regexp TMSession \
-         --regexp BackupScheduling \
-         --regexp 'Mountpoint.*is still valid' \
-         --regexp Local \
-         --regexp 'Accepting a new connection' \
-         --regexp 'Backup list requested' \
-         --regexp 'Spotlight' \
-         --regexp 'Rejected a new connection' |
-    sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
-        -e 's/^[^0-9]/\t/' \
-        -e 's/\ *0x0 *[0-9]* *[0]9* */ /' \
-        -e 's/com.apple.TimeMachine://' \
-        -e 's/(TimeMachine) //' \
-        -e 's/backupd-helper: //' \
-        -e 's/backupd: //;' \
-        -e 's/\]/\t/' \
-        -e 's/\[//' |
-    expand -t 27 |
-    cut -c -"${WIDTH}" |
-    tail -n 20
+    WIDTH=$(tput cols)
 
-printf '%.s-' $( seq 1 "$(tput cols)" )
-echo
+    printf '%.s-' $( seq 1 "${WIDTH}" )
+    echo
+    # per default TM runs each hour: check the last 60 minutes
+    log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
+        grep --line-buffered --invert \
+             --regexp '^Timestamp' \
+             --regexp  'TMPowerState: [0-9]' \
+             --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
+             --regexp 'com.apple.backupd.*.xpc: connection invalid' \
+             --regexp 'Skipping scheduled' \
+             --regexp 'Failed to find a disk' \
+             --regexp 'notifyd ' \
+             --regexp TMSession \
+             --regexp BackupScheduling \
+             --regexp 'Mountpoint.*is still valid' \
+             --regexp Local \
+             --regexp 'Accepting a new connection' \
+             --regexp 'Backup list requested' \
+             --regexp 'Spotlight' \
+             --regexp 'Rejected a new connection' |
+        sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
+            -e 's/^[^0-9]/\t/' \
+            -e 's/\ *0x0 *[0-9]* *[0]9* */ /' \
+            -e 's/com.apple.TimeMachine://' \
+            -e 's/(TimeMachine) //' \
+            -e 's/backupd-helper: //' \
+            -e 's/backupd: //;' \
+            -e 's/\]/\t/' \
+            -e 's/\[//' |
+        expand -t 27 |
+        cut -c -"${WIDTH}" |
+        tail -n 20
+    
+    printf '%.s-' $( seq 1 "$(tput cols)" )
+    echo
+    
+fi
 
