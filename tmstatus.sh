@@ -324,6 +324,34 @@ fi
 
 echo
 
-date
+echo "Last log entries:"
+echo
+log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 10m |
+    grep --line-buffered --invert \
+         --regexp '^Timestamp' \
+         --regexp  'TMPowerState: [0-9]' \
+         --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
+         --regexp 'com.apple.backupd.*.xpc: connection invalid' \
+         --regexp 'Skipping scheduled' \
+         --regexp 'Failed to find a disk' \
+         --regexp 'notifyd ' \
+         --regexp TMSession \
+         --regexp BackupScheduling \
+         --regexp 'Mountpoint.*is still valid' \
+         --regexp Local \
+         --regexp 'Accepting a new connection' \
+         --regexp 'Backup list requested' \
+         --regexp 'Rejected a new connection' |
+    sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
+        -e 's/^[^0-9]/\t/' \
+        -e 's/\ *0x0 *[0-9]* *[0]9* */ /' \
+        -e 's/com.apple.TimeMachine://' \
+        -e 's/(TimeMachine) //' \
+        -e 's/backupd-helper: //' \
+        -e 's/backupd: //;' \
+        -e 's/\]/\t/' \
+        -e 's/\[//' |
+    expand -t 27 |
+    tail -n 20
 
 echo
