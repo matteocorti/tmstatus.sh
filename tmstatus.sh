@@ -326,7 +326,13 @@ echo
 
 echo "Last log entries:"
 echo
-log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 10m |
+
+WIDTH=$(tput cols)
+
+printf '%.s-' $( seq 1 "${WIDTH}" )
+echo
+# per default TM runs each hour: check the last 60 minutes
+log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
     grep --line-buffered --invert \
          --regexp '^Timestamp' \
          --regexp  'TMPowerState: [0-9]' \
@@ -353,6 +359,9 @@ log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 10m |
         -e 's/\]/\t/' \
         -e 's/\[//' |
     expand -t 27 |
+    cut -c -"${WIDTH}" |
     tail -n 20
 
+printf '%.s-' $( seq 1 "$(tput cols)" )
 echo
+
