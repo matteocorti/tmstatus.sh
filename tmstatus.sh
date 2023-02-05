@@ -4,7 +4,7 @@
 #
 # A simple script to summarize the Time Machine backup status
 #
-# Copyright (c) 2018-2022 Matteo Corti <matteo@corti.li>
+# Copyright (c) 2018-2023 Matteo Corti <matteo@corti.li>
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of the Apache License v2
