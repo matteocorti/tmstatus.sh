@@ -24,7 +24,6 @@ version_check:
 # we check for tabs
 # and remove trailing blanks
 formatting_check:
-	! grep -q '\\t' *.sh
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
 
 SHFMT= := $(shell command -v shfmt 2> /dev/null)

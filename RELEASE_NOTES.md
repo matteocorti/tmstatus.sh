@@ -1,1 +1,1 @@
-Option to show the last log entries
+Better log filtering and formatting

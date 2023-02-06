@@ -1,3 +1,5 @@
+* 2023-02-06, Version 1.8.1
+  * Better log filtering and formatting
 * 2023-02-03, Version 1.8.0
   * Option to show the last log entries
 * 2022-08-31, Version 1.7.0

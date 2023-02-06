@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.8.0
+VERSION=1.8.1
 
 export LC_ALL=C
 
@@ -97,7 +97,7 @@ usage() {
     echo
 
     exit
-    
+
 }
 
 COMMAND_LINE_ARGUMENTS=$*
@@ -105,29 +105,29 @@ COMMAND_LINE_ARGUMENTS=$*
 while true; do
 
     case "$1" in
-        -h | --help)
-            usage
-            ;;
-        -l | --log)           
-            SHOWLOG=20
-            if [ $# -gt 1 ]; then
-                # shellcheck disable=SC2295
-                if [ "${2%${2#?}}"x = '-x' ]; then
-                    shift
-                else
-                    SHOWLOG=$2
-                    shift 2
-                fi
-            else
+    -h | --help)
+        usage
+        ;;
+    -l | --log)
+        SHOWLOG=20
+        if [ $# -gt 1 ]; then
+            # shellcheck disable=SC2295
+            if [ "${2%${2#?}}"x = '-x' ]; then
                 shift
+            else
+                SHOWLOG=$2
+                shift 2
             fi
-            ;;
-        *)
-            if [ -n "$1" ]; then
-                echo "Error: unknown option: ${1}"
-            fi
-            break
-            ;;
+        else
+            shift
+        fi
+        ;;
+    *)
+        if [ -n "$1" ]; then
+            echo "Error: unknown option: ${1}"
+        fi
+        break
+        ;;
     esac
 
 done
@@ -138,12 +138,12 @@ printf 'Backups for "%s"\n\n' "${HOSTNAME_TMP}"
 ##############################################################################
 # Backup statistics
 
-KIND="$( tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"
-if [ "${KIND}" = "Local" ] ; then
+KIND="$(tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"
+if [ "${KIND}" = "Local" ]; then
     KIND="Local disk"
 fi
 
-LISTBACKUPS=$( tmutil listbackups 2>&1 )
+LISTBACKUPS=$(tmutil listbackups 2>&1)
 
 if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
@@ -188,28 +188,28 @@ else
     tm_total_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
     tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
     tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
-    
+
     printf 'Volume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
-    
-    DATE="$( echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
+
+    DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
     days="$(days_since "${DATE}")"
-    backup_date=$( echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+    backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
     DAYS_AGO="$(format_days_ago "${days}")"
     printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
     LATESTBACKUP="$(tmutil latestbackup)"
     if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
         # a date was returned (should implement a better test)
-        DATE="$( echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
+        DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
         days=$(days_since "${DATE}")
-        backup_date=$( echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+        backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
         DAYS_AGO="$(format_days_ago "${days}")"
         printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
     else
         printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
     fi
 
-    number=$( echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
+    number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
     printf 'Number:\t\t%s\n' "${number}"
 
 fi
@@ -219,7 +219,7 @@ echo
 ##############################################################################
 # Local backup statistics
 
-LOCALSNAPSHOTDATES=$( tmutil listlocalsnapshotdates / 2>&1 )
+LOCALSNAPSHOTDATES=$(tmutil listlocalsnapshotdates / 2>&1)
 
 if echo "${LOCALSNAPSHOTDATES}" | grep -q '[0-9]'; then
 
@@ -229,7 +229,7 @@ if echo "${LOCALSNAPSHOTDATES}" | grep -q '[0-9]'; then
     tm_total_raw=$(df / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
     tm_available_raw=$(df / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
     tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
-    
+
     printf 'Local: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
     printf 'Local oldest:\t'
     echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
@@ -307,7 +307,7 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     if echo "${status}" | grep -q Remaining; then
 
         echo
-        
+
         secs=$(echo "${status}" | grep Remaining | sed 's/.*\ =\ //' | sed -e 's/.*\ =\ //' -e 's/;.*//' -e 's/^"//' -e 's/"$//' -e 's/[.].*//')
 
         # sometimes the remaining time is negative (?)
@@ -350,16 +350,15 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
     fi
     printf 'Percent:\t%s\n' "${percent}"
 
-    raw_percent=$( echo "${status}" | grep '_raw_Percent' | sed 's/.*\ =\ "//' | sed 's/".*//')
+    raw_percent=$(echo "${status}" | grep '_raw_Percent' | sed 's/.*\ =\ "//' | sed 's/".*//')
 
     if echo "${status}" | grep -q 'bytes'; then
         size=$(echo "${status}" | grep 'bytes\ \=' | sed 's/.*bytes\ \=\ //' | sed 's/;.*//')
-        copied_size=$( echo "${size} / ${raw_percent}" | bc | format_size)
+        copied_size=$(echo "${size} / ${raw_percent}" | bc | format_size)
         size=$(echo "${size}" | format_size)
         printf 'Size:\t\t%s of %s\n' "${size}" "${copied_size}"
     fi
 
-    
 fi
 
 # Print verifying status
@@ -378,29 +377,31 @@ if [ -n "${SHOWLOG}" ]; then
     echo
 
     WIDTH=$(tput cols)
+    SEQ=$(seq 1 "${WIDTH}")
 
-    printf '%.s-' $( seq 1 "${WIDTH}" )
+    # shellcheck disable=SC2086
+    printf '%.s-' ${SEQ}
     echo
     # per default TM runs each hour: check the last 60 minutes
     log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
         grep --line-buffered --invert \
-             --regexp '^Timestamp' \
-             --regexp  'TMPowerState: [0-9]' \
-             --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
-             --regexp 'com.apple.backupd.*.xpc: connection invalid' \
-             --regexp 'Skipping scheduled' \
-             --regexp 'Failed to find a disk' \
-             --regexp 'notifyd ' \
-             --regexp TMSession \
-             --regexp BackupScheduling \
-             --regexp 'Mountpoint.*is still valid' \
-             --regexp Local \
-             --regexp 'Accepting a new connection' \
-             --regexp 'Backup list requested' \
-             --regexp 'Spotlight' \
-             --regexp 'fs_snapshot_list failed' \
-             --regexp 'XPC error for connection' \
-             --regexp 'Rejected a new connection' |
+            --regexp '^Timestamp' \
+            --regexp 'TMPowerState: [0-9]' \
+            --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
+            --regexp 'com.apple.backupd.*.xpc: connection invalid' \
+            --regexp 'Skipping scheduled' \
+            --regexp 'Failed to find a disk' \
+            --regexp 'notifyd ' \
+            --regexp TMSession \
+            --regexp BackupScheduling \
+            --regexp 'Mountpoint.*is still valid' \
+            --regexp Local \
+            --regexp 'Accepting a new connection' \
+            --regexp 'Backup list requested' \
+            --regexp 'Spotlight' \
+            --regexp 'fs_snapshot_list failed' \
+            --regexp 'XPC error for connection' \
+            --regexp 'Rejected a new connection' |
         sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
             -e 's/^[^0-9]/\t/' \
             -e 's/\ *0x[0-9a-f]* *[0-9]* *[0]9* */ /' \
@@ -415,9 +416,9 @@ if [ -n "${SHOWLOG}" ]; then
         expand -t 27 |
         cut -c -"${WIDTH}" |
         tail -n "${SHOWLOG}"
-    
-    printf '%.s-' $( seq 1 "$(tput cols)" )
-    echo
-    
-fi
 
+    # shellcheck disable=SC2086
+    printf '%.s-' ${SEQ}
+    echo
+
+fi
