@@ -3,6 +3,8 @@
 
 &copy; Matteo Corti, 2018-2023
 
+![](https://img.shields.io/github/v/release/matteocorti/tmstatus.sh)&nbsp;![](https://img.shields.io/github/downloads/matteocorti/tmstatus.sh/latest/total)&nbsp;![](https://img.shields.io/github/downloads/matteocorti/tmstatus.sh/total)&nbsp;![](https://img.shields.io/github/license/matteocorti/tmstatus.sh)&nbsp;![](https://img.shields.io/github/stars/matteocorti/tmstatus.sh)&nbsp;![](https://img.shields.io/github/forks/matteocorti/tmstatus.sh)
+
 A simple script to summarize the Time Machine backup status.
 
 Sample output
