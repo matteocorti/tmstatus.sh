@@ -373,52 +373,65 @@ echo
 
 if [ -n "${SHOWLOG}" ]; then
 
-    echo "Last log entries:"
+    echo "Last log entries (last ${SHOWLOG} entries in the last hour):"
     echo
 
     WIDTH=$(tput cols)
     SEQ=$(seq 1 "${WIDTH}")
 
-    # shellcheck disable=SC2086
-    printf '%.s-' ${SEQ}
-    echo
     # per default TM runs each hour: check the last 60 minutes
-    log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
-        grep --line-buffered --invert \
-            --regexp '^Timestamp' \
-            --regexp 'TMPowerState: [0-9]' \
-            --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
-            --regexp 'com.apple.backupd.*.xpc: connection invalid' \
-            --regexp 'Skipping scheduled' \
-            --regexp 'Failed to find a disk' \
-            --regexp 'notifyd ' \
-            --regexp TMSession \
-            --regexp BackupScheduling \
-            --regexp 'Mountpoint.*is still valid' \
-            --regexp Local \
-            --regexp 'Accepting a new connection' \
-            --regexp 'Backup list requested' \
-            --regexp 'Spotlight' \
-            --regexp 'fs_snapshot_list failed' \
-            --regexp 'XPC error for connection' \
-            --regexp 'Rejected a new connection' |
-        sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
-            -e 's/^[^0-9]/\t/' \
-            -e 's/\ *0x[0-9a-f]* *[0-9]* *[0]9* */ /' \
-            -e 's/com.apple.TimeMachine://' \
-            -e 's/(TimeMachine) //' \
-            -e 's/backupd-helper: //' \
-            -e 's/backupd: //' \
-            -e 's/heard: //' \
-            -e 's/lsd: //' \
-            -e 's/\]/\t/' \
-            -e 's/\[//' |
-        expand -t 27 |
-        cut -c -"${WIDTH}" |
-        tail -n "${SHOWLOG}"
+    ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
+                   grep --line-buffered --invert \
+                        --regexp '^Timestamp' \
+                        --regexp 'TMPowerState: [0-9]' \
+                        --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
+                        --regexp 'com.apple.backupd.*.xpc: connection invalid' \
+                        --regexp 'Skipping scheduled' \
+                        --regexp 'Failed to find a disk' \
+                        --regexp 'notifyd ' \
+                        --regexp TMSession \
+                        --regexp BackupScheduling \
+                        --regexp 'Mountpoint.*is still valid' \
+                        --regexp Local \
+                        --regexp 'Accepting a new connection' \
+                        --regexp 'Backup list requested' \
+                        --regexp 'Spotlight' \
+                        --regexp 'fs_snapshot_list failed' \
+                        --regexp 'XPC error for connection' \
+                        --regexp 'Rejected a new connection' |
+                   sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
+                       -e 's/^[^0-9]/\t/' \
+                       -e 's/\ *0x[0-9a-f]* *[0-9]* *[0]9* */ /' \
+                       -e 's/com.apple.TimeMachine://' \
+                       -e 's/(TimeMachine) //' \
+                       -e 's/backupd-helper: //' \
+                       -e 's/backupd: //' \
+                       -e 's/heard: //' \
+                       -e 's/lsd: //' \
+                       -e 's/\]/\t/' \
+                       -e 's/\[//' |
+                   expand -t 27 |
+                   cut -c -"${WIDTH}" |
+                   tail -n "${SHOWLOG}"
+           )
 
-    # shellcheck disable=SC2086
-    printf '%.s-' ${SEQ}
-    echo
+    if [ -n "${ENTRIES}" ] ; then
+        
+        # shellcheck disable=SC2086
+        printf '%.s-' ${SEQ}
+        echo
+        
+        echo "${ENTRIES}"
+        
+        # shellcheck disable=SC2086
+        printf '%.s-' ${SEQ}
+        echo
+
+    else
+
+        echo "No recent entries"
+        
+    fi
+
 
 fi
