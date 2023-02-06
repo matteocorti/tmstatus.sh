@@ -383,7 +383,7 @@ if [ -n "${SHOWLOG}" ]; then
     echo
     # per default TM runs each hour: check the last 60 minutes
     log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
-        Grep --line-buffered --invert \
+        grep --line-buffered --invert \
              --regexp '^Timestamp' \
              --regexp  'TMPowerState: [0-9]' \
              --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
@@ -399,6 +399,7 @@ if [ -n "${SHOWLOG}" ]; then
              --regexp 'Backup list requested' \
              --regexp 'Spotlight' \
              --regexp 'fs_snapshot_list failed' \
+             --regexp 'XPC error for connection' \
              --regexp 'Rejected a new connection' |
         sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
             -e 's/^[^0-9]/\t/' \
