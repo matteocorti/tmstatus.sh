@@ -93,6 +93,7 @@ usage() {
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
     echo "   -q,--quick                      Skip the backup listing"
+    echo "   -V,--version                    Version"
     echo
     echo "Report bugs to https://github.com/matteocorti/tmstatus.sh/issues"
     echo
@@ -126,6 +127,10 @@ while true; do
     -q | --quick)
         QUICK=1
         shift
+        ;;
+    -V | --version)
+        echo "tmstatus.sh version ${VERSION}"
+        exit
         ;;
     *)
         if [ -n "$1" ]; then

@@ -55,6 +55,9 @@ ifdef COMPLETIONS_DIR
 	cp tmstatus.sh.completion $(COMPLETIONS_DIR)/tmstatus.sh
 endif
 
+install:
+	cp tmstatus.sh /usr/local/bin
+
 shellcheck:
 ifndef SHELLCHECK
 	echo "No shellcheck installed: skipping check"
