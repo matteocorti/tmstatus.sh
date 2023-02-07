@@ -1,3 +1,7 @@
+2023-02-07  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: --quick option
+
 2023-02-03  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Show log files

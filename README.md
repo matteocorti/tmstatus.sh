@@ -43,6 +43,7 @@ Usage: tmstatus.sh [OPTIONS]
 Options:
    -h,--help,-?                    This help message
    -l,--log [lines]                Show the last log lines
+   -q,--quick                      Skip the backup listing
 
 
 ```

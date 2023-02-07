@@ -1,1 +1,1 @@
-Better log filtering and formatting
+```--quick``` option
