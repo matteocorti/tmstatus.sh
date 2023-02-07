@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.8.1
+VERSION=1.9.0
 
 export LC_ALL=C
 
@@ -92,6 +92,7 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
+    echo "   -q,--quick                      Skip the backup listing"
     echo
     echo "Report bugs to https://github.com/matteocorti/tmstatus.sh/issues"
     echo
@@ -122,6 +123,10 @@ while true; do
             shift
         fi
         ;;
+    -q| --quick)
+        QUICK=1
+        shift
+        ;;
     *)
         if [ -n "$1" ]; then
             echo "Error: unknown option: ${1}"
@@ -143,11 +148,13 @@ if [ "${KIND}" = "Local" ]; then
     KIND="Local disk"
 fi
 
-LISTBACKUPS=$(tmutil listbackups 2>&1)
+if [ -z "${QUICK}" ] ; then
+    
+    LISTBACKUPS=$(tmutil listbackups 2>&1)
 
-if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
+    if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
-    cat <<'EOF'
+        cat <<'EOF'
 Error:
 
 tmutil: listbackups requires Full Disk Access privileges.
@@ -157,90 +164,92 @@ tab of the Security & Privacy preference pane, and add Terminal
 to the list of applications which are allowed Full Disk Access.
 
 EOF
-    exit 1
+        exit 1
 
-elif echo "${LISTBACKUPS}" | grep -q 'No machine directory found for host.'; then
+    elif echo "${LISTBACKUPS}" | grep -q 'No machine directory found for host.'; then
 
-    if tmutil status 2>&1 | grep -q 'HealthCheckFsck'; then
+        if tmutil status 2>&1 | grep -q 'HealthCheckFsck'; then
 
-        printf 'Time Machine: no information available (performing backup verification)\n'
+            printf 'Time Machine: no information available (performing backup verification)\n'
+
+        else
+
+            printf 'Time Machine (%s):\n' "${KIND}"
+            printf 'Oldest:\t\toffline\n'
+            printf 'Last:\t\toffline\n'
+            printf 'Number:\t\toffline\n'
+
+        fi
+
+    elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
+
+        printf 'Time Machine: no backups found\n'
 
     else
 
-        printf 'Time Machine (%s):\n' "${KIND}"
-        printf 'Oldest:\t\toffline\n'
-        printf 'Last:\t\toffline\n'
-        printf 'Number:\t\toffline\n'
+        tm_mount_point=$(tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //')
 
-    fi
+        tm_total=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
 
-elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
+        tm_total_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
 
-    printf 'Time Machine: no backups found\n'
+        printf 'Volume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
 
-else
-
-    tm_mount_point=$(tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //')
-
-    tm_total=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_available=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-
-    tm_total_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
-
-    printf 'Volume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
-
-    DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
-    days="$(days_since "${DATE}")"
-    backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-    DAYS_AGO="$(format_days_ago "${days}")"
-    printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
-
-    LATESTBACKUP="$(tmutil latestbackup)"
-    if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
-        # a date was returned (should implement a better test)
-        DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
-        days=$(days_since "${DATE}")
-        backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+        DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
+        days="$(days_since "${DATE}")"
+        backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
         DAYS_AGO="$(format_days_ago "${days}")"
-        printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
-    else
-        printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
+        printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+
+        LATESTBACKUP="$(tmutil latestbackup)"
+        if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
+            # a date was returned (should implement a better test)
+            DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
+            days=$(days_since "${DATE}")
+            backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+            DAYS_AGO="$(format_days_ago "${days}")"
+            printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+        else
+            printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
+        fi
+
+        number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
+        printf 'Number:\t\t%s\n' "${number}"
+
     fi
-
-    number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
-    printf 'Number:\t\t%s\n' "${number}"
-
-fi
-
-echo
-
-##############################################################################
-# Local backup statistics
-
-LOCALSNAPSHOTDATES=$(tmutil listlocalsnapshotdates / 2>&1)
-
-if echo "${LOCALSNAPSHOTDATES}" | grep -q '[0-9]'; then
-
-    tm_total=$(df -H / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_available=$(df -H / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-
-    tm_total_raw=$(df / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_available_raw=$(df / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-    tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
-
-    printf 'Local: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
-    printf 'Local oldest:\t'
-    echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
-
-    printf 'Local last:\t'
-    echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
-
-    printf 'Local number:\t'
-    echo "${LOCALSNAPSHOTDATES}" | wc -l | sed 's/\ //g'
 
     echo
+
+    ##############################################################################
+    # Local backup statistics
+
+    LOCALSNAPSHOTDATES=$(tmutil listlocalsnapshotdates / 2>&1)
+
+    if echo "${LOCALSNAPSHOTDATES}" | grep -q '[0-9]'; then
+
+        tm_total=$(df -H / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available=$(df -H / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+
+        tm_total_raw=$(df / | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available_raw=$(df / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
+
+        printf 'Local: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
+        printf 'Local oldest:\t'
+        echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
+
+        printf 'Local last:\t'
+        echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
+
+        printf 'Local number:\t'
+        echo "${LOCALSNAPSHOTDATES}" | wc -l | sed 's/\ //g'
+
+        echo
+
+    fi
 
 fi
 
