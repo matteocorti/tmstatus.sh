@@ -388,7 +388,7 @@ echo
 
 if [ -n "${SHOWLOG}" ]; then
 
-    echo "Last log entries (last ${SHOWLOG} entries in the last hour):"
+    echo "Last log entries (last ${SHOWLOG} entries):"
     echo
 
     WIDTH=$(tput cols)
@@ -396,7 +396,7 @@ if [ -n "${SHOWLOG}" ]; then
 
     # per default TM runs each hour: check the last 60 minutes
     ENTRIES=$(
-        log show --predicate 'subsystem == "com.apple.TimeMachine"' --info --last 60m |
+        log show --predicate 'subsystem == "com.apple.TimeMachine"' --info |
             grep --line-buffered --invert \
                 --regexp '^Timestamp' \
                 --regexp 'TMPowerState: [0-9]' \
