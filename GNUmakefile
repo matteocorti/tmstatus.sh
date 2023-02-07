@@ -52,7 +52,7 @@ disttest: dist formatting_check copyright_check shellcheck
 COMPLETIONS_DIR := $(shell pkg-config --variable=completionsdir bash-completion)
 install_bash_completion:
 ifdef COMPLETIONS_DIR
-	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
+	cp tmstatus.sh.completion $(COMPLETIONS_DIR)/tmstatus.sh
 endif
 
 shellcheck:
