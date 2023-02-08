@@ -416,7 +416,7 @@ if [ -n "${SHOWLOG}" ]; then
                 --regexp 'XPC error for connection' \
                 --regexp 'Rejected a new connection' |
             sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
-                -e 's/^[^0-9]/\t/' \
+                -e 's/^\([^0-9]\)/\t\1/' \
                 -e 's/\ *0x[0-9a-f]* *[0-9]* *[0]9* */ /' \
                 -e 's/com.apple.TimeMachine://' \
                 -e 's/(TimeMachine) //' \
