@@ -415,6 +415,12 @@ if [ -n "${SHOWLOG}" ]; then
                 --regexp 'fs_snapshot_list failed' \
                 --regexp 'XPC error for connection' \
                 --regexp 'LockState' \
+                --regexp 'Tracker: ' \
+                --regexp 'Lookups: ' \
+                --regexp 'Comparisons: ' \
+                --regexp 'ByPhysical' \
+                --regexp 'ByItemCount' \
+                --regexp 'ByEventPath' \
                 --regexp 'Rejected a new connection' |
             sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
                 -e 's/^\([^0-9]\)/\t\1/' \
