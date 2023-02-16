@@ -1,3 +1,7 @@
+2023-02-16  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (status): Some more filtering
+
 2023-02-07  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh.completion: bash completion

@@ -414,6 +414,7 @@ if [ -n "${SHOWLOG}" ]; then
                 --regexp 'Spotlight' \
                 --regexp 'fs_snapshot_list failed' \
                 --regexp 'XPC error for connection' \
+                --regexp 'LockState' \
                 --regexp 'Rejected a new connection' |
             sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
                 -e 's/^\([^0-9]\)/\t\1/' \
