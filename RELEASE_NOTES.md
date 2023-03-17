@@ -1,1 +1,1 @@
-```--quick``` option
+```--today``` option

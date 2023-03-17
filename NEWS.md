@@ -1,4 +1,6 @@
-  * bash completion
+* 2023-03-17, Version 1.10.0
+ * ```--today``` option
+ * bash completion
 * 2023-02-07, Version 1.9.0
   * ```--quick``` option
 * 2023-02-06, Version 1.8.1

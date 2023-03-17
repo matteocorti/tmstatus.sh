@@ -43,9 +43,9 @@ Usage: tmstatus.sh [OPTIONS]
 Options:
    -h,--help,-?                    This help message
    -l,--log [lines]                Show the last log lines
+   -t,--today                      List today's backups
    -q,--quick                      Skip the backup listing
-
-
+   -V,--version                    Version
 ```
 
 ## Bugs

@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.9.0
+VERSION=1.10.0
 
 export LC_ALL=C
 
@@ -92,6 +92,7 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
+    echo "   -t,--today                      List today's backups"
     echo "   -q,--quick                      Skip the backup listing"
     echo "   -V,--version                    Version"
     echo
@@ -123,6 +124,10 @@ while true; do
         else
             shift
         fi
+        ;;
+    -t | --today)
+        TODAY=1
+        shift
         ;;
     -q | --quick)
         QUICK=1
@@ -382,6 +387,17 @@ if echo "${status}" | grep -q -F HealthCheckFsck; then
         percent=$(echo "${status}" | grep 'Percent = ' | sed 's/.*Percent\ =\ \"0\.//' | sed 's/\".*//')
         printf 'Percent:\t%s%%\n' "${percent}"
     fi
+fi
+
+if [ -n "${TODAY}" ] ; then
+
+   echo
+
+   TODAYS_DATE="$( date +"%Y-%m-%d" )"
+   echo "Backups today (${TODAYS_DATE}):"
+   echo
+   echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
+
 fi
 
 echo
