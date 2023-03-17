@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=$(grep VERSION tmstatus.sh | sed 's/.*=//')
+VERSION=$(grep '^VERSION' tmstatus.sh | sed 's/.*=//')
 
 echo "Version ${VERSION}"
 echo 'Did you update the RELEASE_NOTES.md? '
