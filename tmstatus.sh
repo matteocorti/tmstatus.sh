@@ -401,15 +401,14 @@ if [ -n "${TODAY}" ] ; then
 
 
    if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
-       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
+       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE})"
    else
        if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
-           echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}):"
+           echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) at"
        else
-           echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
+           echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) at"
        fi
-       echo   
-       echo "${TODAYS_BACKUPS}"
+       echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
    fi
 
 fi
