@@ -1,3 +1,4 @@
+ * Displays the number of backups today
 * 2023-03-17, Version 1.10.0
  * ```--today``` option
  * bash completion

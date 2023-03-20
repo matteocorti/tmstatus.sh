@@ -394,9 +394,20 @@ if [ -n "${TODAY}" ] ; then
    echo
 
    TODAYS_DATE="$( date +"%Y-%m-%d" )"
-   echo "Backups today (${TODAYS_DATE}):"
+   TODAYS_BACKUPS=$( echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/' )
+
+   # without the grep ':' there is always one line (empty)
+   NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
+
+   if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
+       echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}):"
+   else
+       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
+   fi
    echo
-   echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
+
+   
+   echo "${TODAYS_BACKUPS}"
 
 fi
 
