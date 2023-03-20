@@ -399,15 +399,18 @@ if [ -n "${TODAY}" ] ; then
    # without the grep ':' there is always one line (empty)
    NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
 
-   if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
-       echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}):"
-   else
-       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
-   fi
-   echo
 
-   
-   echo "${TODAYS_BACKUPS}"
+   if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
+       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
+   else
+       if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
+           echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}):"
+       else
+           echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}):"
+       fi
+       echo   
+       echo "${TODAYS_BACKUPS}"
+   fi
 
 fi
 
