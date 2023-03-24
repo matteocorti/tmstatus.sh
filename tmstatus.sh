@@ -190,6 +190,8 @@ EOF
             printf 'Last:\t\toffline\n'
             printf 'Number:\t\toffline\n'
 
+            OFFLINE=1
+            
         fi
 
     elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
@@ -391,25 +393,34 @@ fi
 
 if [ -n "${TODAY}" ] ; then
 
-   echo
+    if [ -z "${OFFLINE}" ] ; then
+    
+        echo
 
-   TODAYS_DATE="$( date +"%Y-%m-%d" )"
-   TODAYS_BACKUPS=$( echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/' )
+        TODAYS_DATE="$( date +"%Y-%m-%d" )"
+        TODAYS_BACKUPS=$( echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/' )
 
-   # without the grep ':' there is always one line (empty)
-   NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
+        # without the grep ':' there is always one line (empty)
+        NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
 
 
-   if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
-       echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE})"
-   else
-       if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
-           echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) at"
-       else
-           echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) at"
-       fi
-       echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
-   fi
+        if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
+            echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE})"
+        else
+            if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
+                echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) at"
+            else
+                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) at"
+            fi
+            echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
+        fi
+
+    else
+
+        echo
+        echo "Time Machine offline: cannot list todays' backups"
+
+    fi
 
 fi
 
