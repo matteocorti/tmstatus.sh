@@ -1,7 +1,7 @@
 SCRIPT=tmstatus.sh
 VERSION=`cat VERSION`
 DIST_DIR=$(SCRIPT)-$(VERSION)
-DIST_FILES=AUTHORS LICENSE ChangeLog Makefile NEWS.md README.md VERSION $(SCRIPT) COPYRIGHT tmstatus.sh.completion
+DIST_FILES=AUTHORS LICENSE ChangeLog Makefile NEWS.md README.md VERSION $(SCRIPT) COPYRIGHT tmstatus.sh.completion COPYING
 YEAR=`date +"%Y"`
 MONTH_YEAR=`date +"%B, %Y"`
 FORMATTED_FILES=AUTHORS LICENSE ChangeLog Makefile NEWS.md README.md VERSION $(SCRIPT) COPYRIGHT tmstatus.sh.completion
