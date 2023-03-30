@@ -444,7 +444,8 @@ if [ -n "${SHOWLOG}" ]; then
     # per default TM runs each hour: check the last 60 minutes
     ENTRIES=$(
         log show --predicate 'subsystem == "com.apple.TimeMachine"' --info |
-            grep --line-buffered --invert \
+            grep --line-buffered \
+                 --invert \
                 --regexp '^Timestamp' \
                 --regexp 'TMPowerState: [0-9]' \
                 --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
@@ -468,6 +469,14 @@ if [ -n "${SHOWLOG}" ]; then
                 --regexp 'ByPhysical' \
                 --regexp 'ByItemCount' \
                 --regexp 'ByEventPath' \
+                --regexp 'time interval since last backup' \
+                --regexp 'BACKUP_CANCELLED_NOT_ENOUGH_ELAPSED_TIME' \
+                --regexp 'Did not match sparsebundle' \
+                --regexp 'Found disk' \
+                --regexp 'Found matching sparsebundle' \
+                --regexp 'to allow volume' \
+                --regexp 'bacuse volume' \
+                --regexp 'Network destination already mounted' \
                 --regexp 'Rejected a new connection' |
             sed -e 's/\.[0-9]*+[0-9][0-9][0-9][0-9] 0x[0-9a-f]* */ /' \
                 -e 's/^\([^0-9]\)/\t\1/' \
