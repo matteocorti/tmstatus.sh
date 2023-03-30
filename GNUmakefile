@@ -65,10 +65,21 @@ else
 	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
 
+CODESPELL := $(shell command -v codespell 2> /dev/null )
+# spell check
+codespell:
+ifndef CODESPELL
+	echo "no codespell installed"
+else
+	codespell \
+	.
+endif
+
+
 copyright_check:
 	grep -q "&copy; Matteo Corti, 2018-$(YEAR)" README.md
 	grep -q "Copyright (c) 2018-$(YEAR) Matteo Corti" COPYRIGHT
 	grep -q "Copyright (c) 2018-$(YEAR) Matteo Corti <matteo@corti.li>" $(SCRIPT)
 	echo "Copyright year check: OK"
 
-.PHONY: clean distclean
+.PHONY: clean distclean codespell

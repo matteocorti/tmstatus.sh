@@ -191,7 +191,7 @@ EOF
             printf 'Number:\t\toffline\n'
 
             OFFLINE=1
-            
+
         fi
 
     elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
@@ -401,7 +401,7 @@ fi
 if [ -n "${TODAY}" ] ; then
 
     if [ -z "${OFFLINE}" ] ; then
-    
+
         echo
 
         TODAYS_DATE="$( date +"%Y-%m-%d" )"

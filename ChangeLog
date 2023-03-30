@@ -4,7 +4,7 @@
 
 2023-03-24  Matteo Corti  <matteo@corti.li>
 
-        * tmstatus.sh (status): Warn if --today is speficied and the time machine is offline
+        * tmstatus.sh (status): Warn if --today is specified and the time machine is offline
 
 2023-03-20  Matteo Corti  <matteo@corti.li>
 
