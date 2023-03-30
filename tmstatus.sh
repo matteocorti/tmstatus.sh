@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.10.0
+VERSION=1.11.0
 
 export LC_ALL=C
 
@@ -356,6 +356,11 @@ if echo "${status}" | grep -q 'BackupPhase'; then
 
         fi
 
+    elif echo "${status}" | grep -q FindingChanges ; then
+
+        percent=$( echo "${status}" | grep FractionDone | sed -e 's/.*[.]\([0-9][0-9]\).*/\1%/' )
+        printf 'Percent:\t%s\n' "${percent}"
+
     fi
 
 else
@@ -363,6 +368,8 @@ else
     printf 'Status:\t\tStopped\n'
 
 fi
+
+
 
 if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
     if echo "${status}" | grep -q '_raw_Percent" = 1;'; then

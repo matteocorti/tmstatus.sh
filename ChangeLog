@@ -1,3 +1,7 @@
+2023-03-30  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (status): Percent of work done by finding changes
+
 2023-03-24  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (status): Warn if --today is speficied and the time machine is offline

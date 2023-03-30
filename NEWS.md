@@ -1,3 +1,5 @@
+* 2023-03-30, Version 1.11.0
+ * Displays the progress by the phase 'finding changes'
  * Displays the number of backups today
 * 2023-03-17, Version 1.10.0
  * ```--today``` option
