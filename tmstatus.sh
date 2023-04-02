@@ -202,11 +202,13 @@ EOF
 
         tm_mount_point=$(tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //')
 
-        tm_total=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-        tm_available=$(df -H "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+        # sometimes df on network volumes throws a 'df: getattrlist failed: Permission denied' error but delivers
+        # the expected result anyway
+        tm_total=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
 
-        tm_total_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-        tm_available_raw=$(df "${tm_mount_point}" | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_total_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+        tm_available_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
         tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
 
         printf 'Volume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"

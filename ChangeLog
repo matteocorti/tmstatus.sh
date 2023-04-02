@@ -1,3 +1,7 @@
+2023-04-02  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: filter out spurious df errors
+
 2023-03-30  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (status): Percent of work done by finding changes
