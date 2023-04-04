@@ -427,7 +427,7 @@ if [ -n "${TODAY}" ] ; then
     else
 
         echo
-        echo "Time Machine offline: cannot list todays' backups"
+        echo "Time Machine offline: cannot list today's backups"
 
     fi
 
