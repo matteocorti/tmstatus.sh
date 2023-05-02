@@ -388,16 +388,17 @@ if [ -n "${LOG_ENTRIES}" ] ; then
             sed 's/.*done, //'
          )
 
-
-    PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
-    PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
-    if [ -n "${PERC_PER_MINUTE}" ] ; then
-        if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
-            PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
-            PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
-        else
-            PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
-            PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+    if ! echo "${SPEED}" | grep -q -- '-, ' ; then    
+        PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
+        PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
+        if [ -n "${PERC_PER_MINUTE}" ] ; then
+            if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
+                PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
+                PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
+            else
+                PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
+                PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+            fi
         fi
     fi
 
@@ -433,11 +434,9 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
         printf 'Size:\t\t%s of %s%s\n' "${size}" "${copied_size}" "${DATA_SPEED}"
     fi
 
-fi
-
-if [ -n "${ITEM_SPEED}" ] ; then
-
-    printf 'Speed:\t\t%s\n' "${ITEM_SPEED}"
+    if [ -n "${ITEM_SPEED}" ] ; then
+        printf 'Speed:\t\t%s\n' "${ITEM_SPEED}"    
+    fi
     
 fi
 
