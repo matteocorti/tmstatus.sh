@@ -1,2 +1,1 @@
- * Displays the progress by the phase 'finding changes'
- * Displays the number of backups today
+If the logs are read, display the backup speed

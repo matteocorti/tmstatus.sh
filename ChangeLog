@@ -1,3 +1,7 @@
+2023-05-02  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: if the logs are read, display the backup speed
+
 2023-04-02  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: filter out spurious df errors

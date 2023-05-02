@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.11.0
+VERSION=1.12.0
 
 export LC_ALL=C
 
@@ -271,6 +271,14 @@ fi
 ##############################################################################
 # Current status
 
+# we read the log file early
+if [ -n "${SHOWLOG}" ]; then
+
+    # per default TM runs each hour: check the last 60 minutes
+    LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
+
+fi
+
 status=$(tmutil status)
 
 if echo "${status}" | grep -q 'BackupPhase'; then
@@ -371,7 +379,41 @@ else
 
 fi
 
+if [ -n "${LOG_ENTRIES}" ] ; then
 
+    SPEED=$(
+        echo "${LOG_ENTRIES}" |
+            grep 'Progress: ' |
+            tail -n 1 |
+            sed 's/.*done, //'
+         )
+
+
+    PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
+    PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
+    if [ -n "${PERC_PER_MINUTE}" ] ; then
+        if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
+            PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
+        else
+            PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
+            PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+        fi
+    fi
+
+    DATA_SPEED=$(
+        echo "${SPEED}" |
+            sed -e 's/.*%\/s, //' -e 's/,[ 0-9.]*items.*//'
+              )
+    if [ -n "${DATA_SPEED}" ] ; then
+        DATA_SPEED=" (${DATA_SPEED})"
+    fi
+
+    ITEM_SPEED=$(
+        echo "${SPEED}" |
+            sed 's/.*MB\/s, //'
+              )
+    
+fi
 
 if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
     if echo "${status}" | grep -q '_raw_Percent" = 1;'; then
@@ -379,7 +421,7 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
     else
         percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
     fi
-    printf 'Percent:\t%s\n' "${percent}"
+    printf 'Percent:\t%s%s\n' "${percent}" "${PERC_PER_MINUTE}"
 
     raw_percent=$(echo "${status}" | grep '_raw_Percent' | sed 's/.*\ =\ "//' | sed 's/".*//')
 
@@ -387,9 +429,15 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
         size=$(echo "${status}" | grep 'bytes\ \=' | sed 's/.*bytes\ \=\ //' | sed 's/;.*//')
         copied_size=$(echo "${size} / ${raw_percent}" | bc | format_size)
         size=$(echo "${size}" | format_size)
-        printf 'Size:\t\t%s of %s\n' "${size}" "${copied_size}"
+        printf 'Size:\t\t%s of %s%s\n' "${size}" "${copied_size}" "${DATA_SPEED}"
     fi
 
+fi
+
+if [ -n "${ITEM_SPEED}" ] ; then
+
+    printf 'Speed:\t\t%s\n' "${ITEM_SPEED}"
+    
 fi
 
 # Print verifying status
@@ -444,8 +492,8 @@ if [ -n "${SHOWLOG}" ]; then
     SEQ=$(seq 1 "${WIDTH}")
 
     # per default TM runs each hour: check the last 60 minutes
-    ENTRIES=$(
-        log show --predicate 'subsystem == "com.apple.TimeMachine"' --info |
+    LOG_ENTRIES=$(
+        echo "${LOG_ENTRIES}" |
             grep --line-buffered \
                  --invert \
                 --regexp '^Timestamp' \
@@ -496,13 +544,13 @@ if [ -n "${SHOWLOG}" ]; then
             tail -n "${SHOWLOG}"
     )
 
-    if [ -n "${ENTRIES}" ]; then
+    if [ -n "${LOG_ENTRIES}" ]; then
 
         # shellcheck disable=SC2086
         printf '%.s-' ${SEQ}
         echo
 
-        echo "${ENTRIES}"
+        echo "${LOG_ENTRIES}"
 
         # shellcheck disable=SC2086
         printf '%.s-' ${SEQ}
