@@ -393,6 +393,7 @@ if [ -n "${LOG_ENTRIES}" ] ; then
     PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
     if [ -n "${PERC_PER_MINUTE}" ] ; then
         if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
+            PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
             PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
         else
             PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )

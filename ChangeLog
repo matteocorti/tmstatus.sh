@@ -1,6 +1,7 @@
 2023-05-02  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: if the logs are read, display the backup speed
+        * tmstatus.sh (status): Shorten the %/s if less then 1
 
 2023-04-02  Matteo Corti  <matteo@corti.li>
 
