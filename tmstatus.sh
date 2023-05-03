@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.12.0
+VERSION=1.13.0
 
 export LC_ALL=C
 
@@ -92,9 +92,10 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
+    echo "   -p,--progress                   Show a progress bar"
+    echo "   -q,--quick                      Skip the backup listing"
     echo "   -s,--speed                      Show the speed of the running backup"
     echo "   -t,--today                      List today's backups"
-    echo "   -q,--quick                      Skip the backup listing"
     echo "   -V,--version                    Version"
     echo
     echo "Report bugs to https://github.com/matteocorti/tmstatus.sh/issues"
@@ -126,16 +127,20 @@ while true; do
             shift
         fi
         ;;
+    -p | --progress)
+        PROGRESS=1
+        shift
+        ;;
+    -q | --quick)
+        QUICK=1
+        shift
+        ;;
     -s | --speed)
         SHOW_SPEED=1
         shift
         ;;
     -t | --today)
         TODAY=1
-        shift
-        ;;
-    -q | --quick)
-        QUICK=1
         shift
         ;;
     -V | --version)
@@ -277,11 +282,20 @@ fi
 # Current status
 
 # we read the log file early (we need the log entries for the backup speed)
-if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] ; then
+if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
 
     # per default TM runs each hour: check the last 60 minutes
     LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
 
+    if [ -n "${PROGRESS}" ] ; then
+        PROGRESS=$(
+            echo "${LOG_ENTRIES}" |
+                grep 'CopyProgress\] \.' |
+                tail -n 1 | sed -e 's/.*CopyProgress\] \./ |/' -e 's/[.]/|/'
+                )
+    fi
+    
+    
 fi
 
 status=$(tmutil status)
@@ -293,6 +307,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     case "${phase}" in
     'BackupNotRunning')
         phase='Not running'
+        ;;
+    'Copying')
+        phase="Copying${PROGRESS}"
         ;;
     'DeletingOldBackups')
         phase='Deleting old backups'

@@ -1,3 +1,5 @@
+* 2023-05-03, Version 1.13.0
+ * Command line option to show a progress bar
  * Command line option to show the speed
 * 2023-05-02, Version 1.12.0
  * If the logs are read, display the backup speed
