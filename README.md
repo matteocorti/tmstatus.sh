@@ -22,7 +22,7 @@ Local oldest:	2023-05-02 12:51:08
 Local last:	2023-05-03 10:55:52
 Local number:	6
 
-Status:		Copying
+Status:		Copying |••••••••  |
 Backup size:	727 GB
 
 Time remaining:	1 minute 25 seconds (finish by 11:03)
