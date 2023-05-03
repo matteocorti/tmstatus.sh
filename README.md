@@ -63,15 +63,18 @@ Last log entries (last 20 entries):
 ## Usage
 
 ```text
-
 Usage: tmstatus.sh [OPTIONS]
 
 Options:
    -h,--help,-?                    This help message
    -l,--log [lines]                Show the last log lines
-   -t,--today                      List today's backups
+   -p,--progress                   Show a progress bar
    -q,--quick                      Skip the backup listing
+   -s,--speed                      Show the speed of the running backup
+   -t,--today                      List today's backups
    -V,--version                    Version
+
+Report bugs to https://github.com/matteocorti/tmstatus.sh/issues
 ```
 
 ## Bugs
