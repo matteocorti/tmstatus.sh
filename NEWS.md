@@ -1,3 +1,4 @@
+ * Command line option to show the speed
 * 2023-05-02, Version 1.12.0
  * If the logs are read, display the backup speed
 * 2023-03-30, Version 1.11.0

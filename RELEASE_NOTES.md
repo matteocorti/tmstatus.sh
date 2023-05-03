@@ -1,1 +1,1 @@
-If the logs are read, display the backup speed
+Command line option to show the speed

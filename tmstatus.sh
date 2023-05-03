@@ -92,6 +92,7 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
+    echo "   -s,--speed                      Show the speed of the running backup"
     echo "   -t,--today                      List today's backups"
     echo "   -q,--quick                      Skip the backup listing"
     echo "   -V,--version                    Version"
@@ -124,6 +125,10 @@ while true; do
         else
             shift
         fi
+        ;;
+    -s | --speed)
+        SHOW_SPEED=1
+        shift
         ;;
     -t | --today)
         TODAY=1
@@ -271,8 +276,8 @@ fi
 ##############################################################################
 # Current status
 
-# we read the log file early
-if [ -n "${SHOWLOG}" ]; then
+# we read the log file early (we need the log entries for the backup speed)
+if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] ; then
 
     # per default TM runs each hour: check the last 60 minutes
     LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
@@ -379,7 +384,7 @@ else
 
 fi
 
-if [ -n "${LOG_ENTRIES}" ] ; then
+if [ -n "${SHOW_SPEED}" ] ; then
 
     SPEED=$(
         echo "${LOG_ENTRIES}" |
