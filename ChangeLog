@@ -1,6 +1,8 @@
 2023-05-03  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (usage): -s option
+        * tmstatus.sh (usage): -p option
+        * tmstatus.sh (status): fix the output if the finding changes progress is 100%
 
 2023-05-02  Matteo Corti  <matteo@corti.li>
 

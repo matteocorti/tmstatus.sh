@@ -391,6 +391,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     elif echo "${status}" | grep -q FindingChanges ; then
 
         percent=$( echo "${status}" | grep FractionDone | sed -e 's/.*[.]\([0-9][0-9]\).*/\1%/' )
+        if echo "${percent}" | grep -q 'FractionDone = 1' ; then
+            percent='100%'
+        fi
         printf 'Percent:\t%s\n' "${percent}"
 
     fi
