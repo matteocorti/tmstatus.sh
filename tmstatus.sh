@@ -512,7 +512,6 @@ echo
 if [ -n "${SHOWLOG}" ]; then
 
     echo "Last log entries (last ${SHOWLOG} entries):"
-    echo
 
     WIDTH=$(tput cols)
     SEQ=$(seq 1 "${WIDTH}")
