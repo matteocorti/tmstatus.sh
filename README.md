@@ -72,6 +72,7 @@ Options:
    -q,--quick                      Skip the backup listing
    -s,--speed                      Show the speed of the running backup
    -t,--today                      List today's backups
+   -v,--verbose                    Show all the available information
    -V,--version                    Version
 
 Report bugs to https://github.com/matteocorti/tmstatus.sh/issues
