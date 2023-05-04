@@ -1,3 +1,4 @@
+ * Added the ```--verbose``` command line option
 * 2023-05-03, Version 1.13.0
  * Command line option to show a progress bar
  * Command line option to show the speed

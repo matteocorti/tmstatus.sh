@@ -96,6 +96,7 @@ usage() {
     echo "   -q,--quick                      Skip the backup listing"
     echo "   -s,--speed                      Show the speed of the running backup"
     echo "   -t,--today                      List today's backups"
+    echo "   -v,--verbose                    Show all the available information"
     echo "   -V,--version                    Version"
     echo
     echo "Report bugs to https://github.com/matteocorti/tmstatus.sh/issues"
@@ -142,6 +143,12 @@ while true; do
     -t | --today)
         TODAY=1
         shift
+        ;;
+    -v | --verbose)
+        SHOWLOG=20
+        PROGRESS=1
+        SHOW_SPEED=1
+        TODAY=1
         ;;
     -V | --version)
         echo "tmstatus.sh version ${VERSION}"

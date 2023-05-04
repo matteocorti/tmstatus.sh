@@ -1,6 +1,7 @@
 2023-05-04  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (status): fix if no speed is available
+        * tmstatus.sh: --verbose option
 
 2023-05-03  Matteo Corti  <matteo@corti.li>
 
