@@ -286,7 +286,7 @@ if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
 
     # per default TM runs each hour: check the last 60 minutes
     LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
-
+    
     if [ -n "${PROGRESS}" ] ; then
         PROGRESS=$(
             echo "${LOG_ENTRIES}" |
@@ -413,32 +413,33 @@ if [ -n "${SHOW_SPEED}" ] ; then
             sed 's/.*done, //'
          )
 
-    if ! echo "${SPEED}" | grep -q -- '-, ' ; then    
-        PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
-        PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
-        if [ -n "${PERC_PER_MINUTE}" ] ; then
-            if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
-                PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
-                PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
-            else
-                PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
-                PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+    if [ -n "${SPEED}" ] ; then
+        if ! echo "${SPEED}" | grep -q -- '-, ' ; then    
+            PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
+            PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
+            if [ -n "${PERC_PER_MINUTE}" ] ; then
+                if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
+                    PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
+                    PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
+                else
+                    PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
+                    PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+                fi
             fi
         fi
-    fi
+        DATA_SPEED=$(
+            echo "${SPEED}" |
+                sed -e 's/.*%\/s, //' -e 's/,[ 0-9.]*items.*//'
+                  )
+        if [ -n "${DATA_SPEED}" ] ; then
+            DATA_SPEED=" (${DATA_SPEED})"
+        fi
 
-    DATA_SPEED=$(
-        echo "${SPEED}" |
-            sed -e 's/.*%\/s, //' -e 's/,[ 0-9.]*items.*//'
-              )
-    if [ -n "${DATA_SPEED}" ] ; then
-        DATA_SPEED=" (${DATA_SPEED})"
-    fi
-
-    ITEM_SPEED=$(
-        echo "${SPEED}" |
-            sed 's/.*MB\/s, //'
-              )
+        ITEM_SPEED=$(
+            echo "${SPEED}" |
+                sed 's/.*MB\/s, //'
+                  )
+    fi        
     
 fi
 
