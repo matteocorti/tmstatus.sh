@@ -179,7 +179,7 @@ fi
 
 if [ -z "${QUICK}" ]; then
 
-    printf "Listing backups..,"
+    printf "Listing backups..."
 
     LISTBACKUPS=$(tmutil listbackups 2>&1)
 
