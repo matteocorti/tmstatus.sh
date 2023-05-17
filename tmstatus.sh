@@ -149,6 +149,7 @@ while true; do
         PROGRESS=1
         SHOW_SPEED=1
         TODAY=1
+        shift
         ;;
     -V | --version)
         echo "tmstatus.sh version ${VERSION}"
@@ -178,8 +179,12 @@ fi
 
 if [ -z "${QUICK}" ]; then
 
+    printf "Listing backups..,"
+
     LISTBACKUPS=$(tmutil listbackups 2>&1)
 
+    printf "\r                    \r"
+    
     if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
         cat <<'EOF'
@@ -291,8 +296,13 @@ fi
 # we read the log file early (we need the log entries for the backup speed)
 if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
 
+    printf "Reading the logs..."
+    
     # per default TM runs each hour: check the last 60 minutes
     LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
+
+    # go back at the beginning of the line
+    printf "\r                    \r"
     
     if [ -n "${PROGRESS}" ] ; then
         PROGRESS=$(
