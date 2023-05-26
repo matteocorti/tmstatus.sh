@@ -299,7 +299,9 @@ if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
     printf "Reading the logs..."
     
     # per default TM runs each hour: check the last 60 minutes
-    LOG_ENTRIES=$( log show --predicate 'subsystem == "com.apple.TimeMachine"' --info )
+    LOG_LAST='--last 30m'
+    # shellcheck disable=SC2086
+    LOG_ENTRIES=$( log show ${LOG_LAST} --color none --predicate 'subsystem == "com.apple.TimeMachine"' --info )
 
     # go back at the beginning of the line
     printf "\r                    \r"
