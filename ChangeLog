@@ -1,3 +1,7 @@
+2023-05-30  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (status): Show the time window for the log analysis
+
 2023-05-26  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Parse only the last 60 minutes in the logs (faster)
