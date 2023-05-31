@@ -166,8 +166,8 @@ while true; do
 
 done
 
-HOSTNAME_TMP="$(hostname)"
-printf 'Backups for "%s"\n\n' "${HOSTNAME_TMP}"
+COMPUTER_TMP="$(scutil --get LocalHostName)"
+printf 'Backups for "%s"\n\n' "${COMPUTER_TMP}"
 
 ##############################################################################
 # Backup statistics

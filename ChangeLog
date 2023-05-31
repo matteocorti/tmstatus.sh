@@ -1,3 +1,7 @@
+2023-05-31  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (COMPUTER_TMP): Better computer name
+
 2023-05-30  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (status): Show the time window for the log analysis
