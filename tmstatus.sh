@@ -166,7 +166,7 @@ while true; do
 
 done
 
-COMPUTER_TMP="$(scutil --get LocalHostName)"
+COMPUTER_TMP="$(scutil --get ComputerName)"
 printf 'Backups for "%s"\n\n' "${COMPUTER_TMP}"
 
 ##############################################################################
