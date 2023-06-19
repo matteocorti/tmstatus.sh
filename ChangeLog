@@ -1,3 +1,11 @@
+2023-06-19  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Support multiple destinations
+
+2023-06-17  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (status): Fixed a small display bug when fining changes is at 0%
+
 2023-05-31  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh (COMPUTER_TMP): Better computer name

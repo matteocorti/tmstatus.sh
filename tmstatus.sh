@@ -172,7 +172,13 @@ printf 'Backups for "%s"\n\n' "${COMPUTER_TMP}"
 ##############################################################################
 # Backup statistics
 
-KIND="$(tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"
+if tmutil destinationinfo | grep -q '^>' ; then
+    # multiple destinations
+    KIND="$( tmutil destinationinfo | grep -A 100 '^>' | grep -B 100 '^=' | grep '^Kind' | sed 's/.*:\ //')"
+else
+    KIND="$(tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"    
+fi
+
 if [ "${KIND}" = "Local" ]; then
     KIND="Local disk"
 fi
@@ -412,6 +418,8 @@ if echo "${status}" | grep -q 'BackupPhase'; then
         percent=$( echo "${status}" | grep FractionDone | sed -e 's/.*[.]\([0-9][0-9]\).*/\1%/' )
         if echo "${percent}" | grep -q 'FractionDone = 1' ; then
             percent='100%'
+        elif echo "${percent}" | grep -q 'FractionDone = 0' ; then
+            percent='0%'
         fi
         printf 'Percent:\t%s\n' "${percent}"
 
