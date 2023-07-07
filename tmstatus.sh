@@ -537,6 +537,8 @@ if [ -n "${TODAY}" ]; then
 
     TODAYS_DATE="$(date +"%Y-%m-%d")"
 
+    echo
+
     tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
         LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
@@ -545,17 +547,16 @@ if [ -n "${TODAY}" ]; then
         # without the grep ':' there is always one line (empty)
         NUMBER_OF_TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g')
 
-        echo
+        TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | tr '\n' ',' | sed 's/,/, /g' | sed 's/, $//' )
 
         if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
-                printf '%s backup today (%s) on "%s" at ' "${NUMBER_OF_TODAYS_BACKUPS}" "(${TODAYS_DATE})" "${tm_mount_point}"
+                printf '%s backup today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "(${TODAYS_DATE})" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             else
-                printf '%s backups today (%s) on "%s" at ' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}"
+                printf '%s backups today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             fi
-            echo "${TODAYS_BACKUPS}" | tr '\n' ',' | sed 's/,/, /g' | sed 's/, $//'
         fi
 
     done
