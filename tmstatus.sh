@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.14.0
+VERSION=1.15.0
 
 export LC_ALL=C
 
