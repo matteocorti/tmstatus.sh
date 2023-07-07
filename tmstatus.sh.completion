@@ -13,7 +13,7 @@ _tmstatus.sh() {
     #   only the autocompletion with long options is implemented: long options are more readable and quick to enter since we are
     #   using autocompletion.
     #
-    opts="--log --help --progress --quick --speed --today --verbose --version"
+    opts="--all --log --help --progress --quick --speed --today --verbose --version"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]]; then
         # shellcheck disable=2207

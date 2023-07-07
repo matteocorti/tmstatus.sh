@@ -1,3 +1,7 @@
+* 2023-07-07, Versiom 1.15.0
+ * Show information for all the disks (```--all``` option)
+* 2023-06-27, Version 1.14.0
+ * Parsing of destinationinfo with more than one destination
  * Added the ```--verbose``` command line option
 * 2023-05-03, Version 1.13.0
  * Command line option to show a progress bar

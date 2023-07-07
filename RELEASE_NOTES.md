@@ -1,2 +1,1 @@
-* Command line option to show a progress bar
-* Command line option to show the speed
+Show information for all the disks (```--all``` option)

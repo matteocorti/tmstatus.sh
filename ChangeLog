@@ -1,3 +1,11 @@
+2023-07-07  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: show information for all the disks (--all option)
+
+2023-06-27  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh (parse_destination_info): Parsing of destinationinfo with more than one destination
+
 2023-06-19  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Support multiple destinations

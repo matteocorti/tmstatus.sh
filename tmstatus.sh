@@ -12,9 +12,27 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.13.0
+VERSION=1.14.0
 
 export LC_ALL=C
+
+parse_destination_info() {
+
+    key=$1
+
+    if tmutil destinationinfo | grep -q '^>' ; then
+        # multiple destinations
+        result="$( tmutil destinationinfo | grep -A 100 '^>')"
+        if echo "${result}" | grep -q '^=' ; then
+            result="$( echo "${result}" | grep -B 100 '^=' | grep "^${key}" | sed 's/.*:\ //')"
+        else
+            result="$( echo "${result}" | grep "^${key}" | sed 's/.*:\ //')"
+        fi
+    else
+        result="$(tmutil destinationinfo | grep "^${key}" | sed 's/.*:\ //')"    
+    fi
+    KEY="${result}"
+}
 
 format_size() {
     while read -r B; do
@@ -90,6 +108,7 @@ usage() {
     echo
     echo "Options:"
     # Delimiter at 78 chars ############################################################
+    echo "   -a,--all                        Show information for all the volumes"
     echo "   -h,--help,-?                    This help message"
     echo "   -l,--log [lines]                Show the last log lines"
     echo "   -p,--progress                   Show a progress bar"
@@ -111,6 +130,10 @@ COMMAND_LINE_ARGUMENTS=$*
 while true; do
 
     case "$1" in
+        -a | --all)
+            ALL=1
+            shift
+            ;;
     -h | --help)
         usage
         ;;
@@ -167,17 +190,14 @@ while true; do
 done
 
 COMPUTER_TMP="$(scutil --get ComputerName)"
-printf 'Backups for "%s"\n\n' "${COMPUTER_TMP}"
+printf 'Backups for "%s"\n' "${COMPUTER_TMP}"
 
 ##############################################################################
 # Backup statistics
 
-if tmutil destinationinfo | grep -q '^>' ; then
-    # multiple destinations
-    KIND="$( tmutil destinationinfo | grep -A 100 '^>' | grep -B 100 '^=' | grep '^Kind' | sed 's/.*:\ //')"
-else
-    KIND="$(tmutil destinationinfo | grep '^Kind' | sed 's/.*:\ //')"    
-fi
+parse_destination_info Kind
+KIND="${KEY}"
+
 
 if [ "${KIND}" = "Local" ]; then
     KIND="Local disk"
@@ -185,15 +205,13 @@ fi
 
 if [ -z "${QUICK}" ]; then
 
-    printf "Listing backups..."
+    tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
-    LISTBACKUPS=$(tmutil listbackups 2>&1)
-
-    printf "\r                    \r"
+        LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
     
-    if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
+        if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
-        cat <<'EOF'
+            cat <<'EOF'
 Error:
 
 tmutil: listbackups requires Full Disk Access privileges.
@@ -203,68 +221,70 @@ tab of the Security & Privacy preference pane, and add Terminal
 to the list of applications which are allowed Full Disk Access.
 
 EOF
-        exit 1
+            exit 1
 
-    elif echo "${LISTBACKUPS}" | grep -q 'No machine directory found for host.'; then
+        elif echo "${LISTBACKUPS}" | grep -q 'No machine directory found for host.'; then
 
-        if tmutil status 2>&1 | grep -q 'HealthCheckFsck'; then
+            if tmutil status 2>&1 | grep -q 'HealthCheckFsck'; then
 
-            printf 'Time Machine: no information available (performing backup verification)\n'
+                printf 'Time Machine: no information available (performing backup verification)\n'
+
+            else
+
+                printf 'Time Machine (%s):\n' "${KIND}"
+                printf 'Oldest:\t\toffline\n'
+                printf 'Last:\t\toffline\n'
+                printf 'Number:\t\toffline\n'
+
+                # shellcheck disable=SC2030
+                OFFLINE=1
+
+            fi
+
+        elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
+
+            printf 'Time Machine: no backups found\n'
 
         else
 
-            printf 'Time Machine (%s):\n' "${KIND}"
-            printf 'Oldest:\t\toffline\n'
-            printf 'Last:\t\toffline\n'
-            printf 'Number:\t\toffline\n'
+            # sometimes df on network volumes throws a 'df: getattrlist failed: Permission denied' error but delivers
+            # the expected result anyway
+            tm_total=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_available=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
 
-            OFFLINE=1
+            tm_total_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_available_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
 
-        fi
+            printf '\nVolume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
 
-    elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
-
-        printf 'Time Machine: no backups found\n'
-
-    else
-
-        tm_mount_point=$(tmutil destinationinfo | grep '^Mount\ Point' | sed 's/.*:\ //')
-
-        # sometimes df on network volumes throws a 'df: getattrlist failed: Permission denied' error but delivers
-        # the expected result anyway
-        tm_total=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-        tm_available=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-
-        tm_total_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
-        tm_available_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
-        tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
-
-        printf 'Volume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
-
-        DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
-        days="$(days_since "${DATE}")"
-        backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-        DAYS_AGO="$(format_days_ago "${days}")"
-        printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
-
-        LATESTBACKUP="$(tmutil latestbackup)"
-        if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
-            # a date was returned (should implement a better test)
-            DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
-            days=$(days_since "${DATE}")
-            backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+            DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
+            days="$(days_since "${DATE}")"
+            backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
             DAYS_AGO="$(format_days_ago "${days}")"
-            printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
-        else
-            printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
+            printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+
+            LATESTBACKUP="$(tmutil latestbackup)"
+            if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
+                # a date was returned (should implement a better test)
+                DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
+                days=$(days_since "${DATE}")
+                backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+                DAYS_AGO="$(format_days_ago "${days}")"
+                printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+            else
+                printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
+            fi
+
+            number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
+            printf 'Number:\t\t%s\n' "${number}"
+
+            # shellcheck disable=SC2030
+            FOUND=1
+
         fi
 
-        number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
-        printf 'Number:\t\t%s\n' "${number}"
-
-    fi
-
-    echo
+    done
 
     ##############################################################################
     # Local backup statistics
@@ -280,7 +300,7 @@ EOF
         tm_available_raw=$(df / | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
         tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
 
-        printf 'Local: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
+        printf '\nLocal: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
         printf 'Local oldest:\t'
         echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
 
@@ -324,6 +344,8 @@ if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
 fi
 
 status=$(tmutil status)
+
+current_mount_point=$( tmutil status | grep DestinationMountPoint | sed -e 's/.* = "//' -e 's/".*//' )
 
 if echo "${status}" | grep -q 'BackupPhase'; then
 
@@ -376,7 +398,11 @@ if echo "${status}" | grep -q 'BackupPhase'; then
 
     esac
 
-    printf 'Status:\t\t%s\n' "${phase}"
+    if [ -n "${current_mount_point}" ] ; then
+        printf 'Status:\t\t%s on %s\n' "${phase}" "${current_mount_point}"
+    else
+        printf 'Status:\t\t%s\n' "${phase}"
+    fi
 
     if echo "${status}" | grep -q 'totalBytes'; then
         total_size=$(echo "${status}" | grep 'totalBytes\ \=' | sed 's/.*totalBytes\ \=\ //' | sed 's/;.*//' | format_size)
@@ -503,34 +529,30 @@ fi
 
 if [ -n "${TODAY}" ] ; then
 
-    if [ -z "${OFFLINE}" ] ; then
+    TODAYS_DATE="$( date +"%Y-%m-%d" )"
 
-        echo
+    tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
-        TODAYS_DATE="$( date +"%Y-%m-%d" )"
+        LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
         TODAYS_BACKUPS=$( echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/' )
-
+        
         # without the grep ':' there is always one line (empty)
         NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
-
-
+        
+        echo
+        
         if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
-            echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE})"
+            echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
-                echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) at"
+                echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
             else
-                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) at"
+                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on ${tm_mount_point}\" at"
             fi
             echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
         fi
-
-    else
-
-        echo
-        echo "Time Machine offline: cannot list today's backups"
-
-    fi
+        
+    done
 
 fi
 
