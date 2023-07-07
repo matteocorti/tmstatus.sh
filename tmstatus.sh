@@ -405,7 +405,7 @@ if echo "${status}" | grep -q 'BackupPhase'; then
     esac
 
     if [ -n "${current_mount_point}" ]; then
-        printf 'Status:\t\t%s on %s\n' "${phase}" "${current_mount_point}"
+        printf 'Status:\t\t%s on "%s"\n' "${phase}" "${current_mount_point}"
     else
         printf 'Status:\t\t%s\n' "${phase}"
     fi
@@ -551,11 +551,11 @@ if [ -n "${TODAY}" ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
-                echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
+                printf '%s backup today (%s) on "%s" at ' "${NUMBER_OF_TODAYS_BACKUPS}" "(${TODAYS_DATE})" "${tm_mount_point}"
             else
-                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
+                printf '%s backups today (%s) on "%s" at ' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}"
             fi
-            echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
+            echo "${TODAYS_BACKUPS}" | tr '\n' ',' | sed 's/,/, /g' | sed 's/, $//'
         fi
 
     done

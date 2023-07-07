@@ -1,6 +1,7 @@
 2023-07-07  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: show information for all the disks (--all option)
+        * tmstatus.sh: today's backups on one line per destination
 
 2023-06-27  Matteo Corti  <matteo@corti.li>
 
