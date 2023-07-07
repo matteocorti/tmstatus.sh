@@ -172,6 +172,7 @@ while true; do
         PROGRESS=1
         SHOW_SPEED=1
         TODAY=1
+        ALL=1
         shift
         ;;
     -V | --version)
@@ -537,8 +538,10 @@ if [ -n "${TODAY}" ]; then
 
     TODAYS_DATE="$(date +"%Y-%m-%d")"
 
-    echo
-
+    if tmutil destinationinfo | grep -q '^Mount Point' ; then
+        echo
+    fi
+    
     tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
         LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
