@@ -553,7 +553,7 @@ if [ -n "${TODAY}" ]; then
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
                 echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
             else
-                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on ${tm_mount_point}\" at"
+                echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
             fi
             echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
         fi
