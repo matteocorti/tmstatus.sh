@@ -20,16 +20,16 @@ parse_destination_info() {
 
     key=$1
 
-    if tmutil destinationinfo | grep -q '^>' ; then
+    if tmutil destinationinfo | grep -q '^>'; then
         # multiple destinations
-        result="$( tmutil destinationinfo | grep -A 100 '^>')"
-        if echo "${result}" | grep -q '^=' ; then
-            result="$( echo "${result}" | grep -B 100 '^=' | grep "^${key}" | sed 's/.*:\ //')"
+        result="$(tmutil destinationinfo | grep -A 100 '^>')"
+        if echo "${result}" | grep -q '^='; then
+            result="$(echo "${result}" | grep -B 100 '^=' | grep "^${key}" | sed 's/.*:\ //')"
         else
-            result="$( echo "${result}" | grep "^${key}" | sed 's/.*:\ //')"
+            result="$(echo "${result}" | grep "^${key}" | sed 's/.*:\ //')"
         fi
     else
-        result="$(tmutil destinationinfo | grep "^${key}" | sed 's/.*:\ //')"    
+        result="$(tmutil destinationinfo | grep "^${key}" | sed 's/.*:\ //')"
     fi
     KEY="${result}"
 }
@@ -130,10 +130,10 @@ COMMAND_LINE_ARGUMENTS=$*
 while true; do
 
     case "$1" in
-        -a | --all)
-            ALL=1
-            shift
-            ;;
+    -a | --all)
+        ALL=1
+        shift
+        ;;
     -h | --help)
         usage
         ;;
@@ -198,7 +198,6 @@ printf 'Backups for "%s"\n' "${COMPUTER_TMP}"
 parse_destination_info Kind
 KIND="${KEY}"
 
-
 if [ "${KIND}" = "Local" ]; then
     KIND="Local disk"
 fi
@@ -208,7 +207,7 @@ if [ -z "${QUICK}" ]; then
     tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
         LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
-    
+
         if echo "${LISTBACKUPS}" | grep -q -F 'listbackups requires Full Disk Access privileges'; then
 
             cat <<'EOF'
@@ -301,11 +300,19 @@ EOF
         tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
 
         printf '\nLocal: %s (%s available, %s%%)\n' "${tm_total}" "${tm_available}" "${tm_percent_available}"
-        printf 'Local oldest:\t'
-        echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
 
-        printf 'Local last:\t'
-        echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/'
+        DATE="$(echo "${LOCALSNAPSHOTDATES}" | sed -n 2p)"
+        days="$(days_since "${DATE}")"
+        DAYS_AGO="$(format_days_ago "${days}")"
+        BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
+
+        printf 'Local oldest:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
+
+        DATE="$(echo "${LOCALSNAPSHOTDATES}" | sed -n 2p)"
+        days="$(days_since "${DATE}")"
+        DAYS_AGO="$(format_days_ago "${days}")"
+        BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
+        printf 'Local last:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
 
         printf 'Local number:\t'
         echo "${LOCALSNAPSHOTDATES}" | wc -l | sed 's/\ //g'
@@ -320,32 +327,31 @@ fi
 # Current status
 
 # we read the log file early (we need the log entries for the backup speed)
-if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ] ; then
+if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ]; then
 
     printf "Reading the logs..."
-    
+
     # per default TM runs each hour: check the last 60 minutes
     LOG_LAST='--last 60m'
     # shellcheck disable=SC2086
-    LOG_ENTRIES=$( log show ${LOG_LAST} --color none --predicate 'subsystem == "com.apple.TimeMachine"' --info )
+    LOG_ENTRIES=$(log show ${LOG_LAST} --color none --predicate 'subsystem == "com.apple.TimeMachine"' --info)
 
     # go back at the beginning of the line
     printf "\r                    \r"
-    
-    if [ -n "${PROGRESS}" ] ; then
+
+    if [ -n "${PROGRESS}" ]; then
         PROGRESS=$(
             echo "${LOG_ENTRIES}" |
                 grep 'CopyProgress\] \.' |
                 tail -n 1 | sed -e 's/.*CopyProgress\] \./ |/' -e 's/[.]/|/'
-                )
+        )
     fi
-    
-    
+
 fi
 
 status=$(tmutil status)
 
-current_mount_point=$( tmutil status | grep DestinationMountPoint | sed -e 's/.* = "//' -e 's/".*//' )
+current_mount_point=$(tmutil status | grep DestinationMountPoint | sed -e 's/.* = "//' -e 's/".*//')
 
 if echo "${status}" | grep -q 'BackupPhase'; then
 
@@ -398,7 +404,7 @@ if echo "${status}" | grep -q 'BackupPhase'; then
 
     esac
 
-    if [ -n "${current_mount_point}" ] ; then
+    if [ -n "${current_mount_point}" ]; then
         printf 'Status:\t\t%s on %s\n' "${phase}" "${current_mount_point}"
     else
         printf 'Status:\t\t%s\n' "${phase}"
@@ -439,12 +445,12 @@ if echo "${status}" | grep -q 'BackupPhase'; then
 
         fi
 
-    elif echo "${status}" | grep -q FindingChanges ; then
+    elif echo "${status}" | grep -q FindingChanges; then
 
-        percent=$( echo "${status}" | grep FractionDone | sed -e 's/.*[.]\([0-9][0-9]\).*/\1%/' )
-        if echo "${percent}" | grep -q 'FractionDone = 1' ; then
+        percent=$(echo "${status}" | grep FractionDone | sed -e 's/.*[.]\([0-9][0-9]\).*/\1%/')
+        if echo "${percent}" | grep -q 'FractionDone = 1'; then
             percent='100%'
-        elif echo "${percent}" | grep -q 'FractionDone = 0' ; then
+        elif echo "${percent}" | grep -q 'FractionDone = 0'; then
             percent='0%'
         fi
         printf 'Percent:\t%s\n' "${percent}"
@@ -457,25 +463,25 @@ else
 
 fi
 
-if [ -n "${SHOW_SPEED}" ] ; then
+if [ -n "${SHOW_SPEED}" ]; then
 
     SPEED=$(
         echo "${LOG_ENTRIES}" |
             grep 'Progress: ' |
             tail -n 1 |
             sed 's/.*done, //'
-         )
+    )
 
-    if [ -n "${SPEED}" ] ; then
-        if ! echo "${SPEED}" | grep -q -- '-, ' ; then    
-            PERC_PER_SECOND=$( echo "${SPEED}" | sed 's/%\/s.*//' )
-            PERC_PER_MINUTE=$( echo "scale=2;${PERC_PER_SECOND}*60" | bc )
-            if [ -n "${PERC_PER_MINUTE}" ] ; then
-                if echo "${PERC_PER_MINUTE}" | grep -q '^[.]' ; then
-                    PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/' )
+    if [ -n "${SPEED}" ]; then
+        if ! echo "${SPEED}" | grep -q -- '-, '; then
+            PERC_PER_SECOND=$(echo "${SPEED}" | sed 's/%\/s.*//')
+            PERC_PER_MINUTE=$(echo "scale=2;${PERC_PER_SECOND}*60" | bc)
+            if [ -n "${PERC_PER_MINUTE}" ]; then
+                if echo "${PERC_PER_MINUTE}" | grep -q '^[.]'; then
+                    PERC_PER_MINUTE=$(echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/')
                     PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
                 else
-                    PERC_PER_MINUTE=$( echo "${PERC_PER_MINUTE}" | sed 's/[.].*//' )
+                    PERC_PER_MINUTE=$(echo "${PERC_PER_MINUTE}" | sed 's/[.].*//')
                     PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
                 fi
             fi
@@ -483,17 +489,17 @@ if [ -n "${SHOW_SPEED}" ] ; then
         DATA_SPEED=$(
             echo "${SPEED}" |
                 sed -e 's/.*%\/s, //' -e 's/,[ 0-9.]*items.*//'
-                  )
-        if [ -n "${DATA_SPEED}" ] ; then
+        )
+        if [ -n "${DATA_SPEED}" ]; then
             DATA_SPEED=" (${DATA_SPEED})"
         fi
 
         ITEM_SPEED=$(
             echo "${SPEED}" |
                 sed 's/.*MB\/s, //'
-                  )
-    fi        
-    
+        )
+    fi
+
 fi
 
 if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
@@ -513,10 +519,10 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
         printf 'Size:\t\t%s of %s%s\n' "${size}" "${copied_size}" "${DATA_SPEED}"
     fi
 
-    if [ -n "${ITEM_SPEED}" ] ; then
-        printf 'Speed:\t\t%s\n' "${ITEM_SPEED}"    
+    if [ -n "${ITEM_SPEED}" ]; then
+        printf 'Speed:\t\t%s\n' "${ITEM_SPEED}"
     fi
-    
+
 fi
 
 # Print verifying status
@@ -527,31 +533,31 @@ if echo "${status}" | grep -q -F HealthCheckFsck; then
     fi
 fi
 
-if [ -n "${TODAY}" ] ; then
+if [ -n "${TODAY}" ]; then
 
-    TODAYS_DATE="$( date +"%Y-%m-%d" )"
+    TODAYS_DATE="$(date +"%Y-%m-%d")"
 
     tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
         LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
-        TODAYS_BACKUPS=$( echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}"  | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/' )
-        
+        TODAYS_BACKUPS=$(echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}" | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/')
+
         # without the grep ':' there is always one line (empty)
-        NUMBER_OF_TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g' )
-        
+        NUMBER_OF_TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g')
+
         echo
-        
-        if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ] ; then
+
+        if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
-            if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ] ; then
+            if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
                 echo "${NUMBER_OF_TODAYS_BACKUPS} backup today (${TODAYS_DATE}) on \"${tm_mount_point}\" at"
             else
                 echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on ${tm_mount_point}\" at"
             fi
             echo "${TODAYS_BACKUPS}" | sed 's/^/  * /'
         fi
-        
+
     done
 
 fi
@@ -560,7 +566,7 @@ echo
 
 if [ -n "${SHOWLOG}" ]; then
 
-    LOG_LAST=$( echo "${LOG_LAST}" | sed 's/--last //' )
+    LOG_LAST=$(echo "${LOG_LAST}" | sed 's/--last //')
 
     echo "Last log entries (last ${SHOWLOG} entries in the last ${LOG_LAST}):"
 
@@ -571,7 +577,7 @@ if [ -n "${SHOWLOG}" ]; then
     LOG_ENTRIES=$(
         echo "${LOG_ENTRIES}" |
             grep --line-buffered \
-                 --invert \
+                --invert \
                 --regexp '^Timestamp' \
                 --regexp 'TMPowerState: [0-9]' \
                 --regexp 'Running for notifyd event com.apple.powermanagement.systempowerstate' \
