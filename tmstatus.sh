@@ -262,7 +262,7 @@ EOF
             days="$(days_since "${DATE}")"
             backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
             DAYS_AGO="$(format_days_ago "${days}")"
-            printf 'Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+            printf '  Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
             LATESTBACKUP="$(tmutil latestbackup)"
             if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
@@ -271,13 +271,13 @@ EOF
                 days=$(days_since "${DATE}")
                 backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
                 DAYS_AGO="$(format_days_ago "${days}")"
-                printf 'Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+                printf '  Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
             else
-                printf 'Last:\t\t%s\n' "${LATESTBACKUP}"
+                printf '  Last:\t\t%s\n' "${LATESTBACKUP}"
             fi
 
             number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
-            printf 'Number:\t\t%s\n' "${number}"
+            printf '  Number:\t\t%s\n' "${number}"
 
             # shellcheck disable=SC2030
             FOUND=1
@@ -307,15 +307,15 @@ EOF
         DAYS_AGO="$(format_days_ago "${days}")"
         BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | sed -n 2p | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
 
-        printf 'Local oldest:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
+        printf '  Local oldest:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
 
         DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 )"
         days="$(days_since "${DATE}")"
         DAYS_AGO="$(format_days_ago "${days}")"
         BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
-        printf 'Local last:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
+        printf '  Local last:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
 
-        printf 'Local number:\t'
+        printf '  Local number:\t'
         echo "${LOCALSNAPSHOTDATES}" | wc -l | sed 's/\ //g'
 
         echo
