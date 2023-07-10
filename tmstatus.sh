@@ -556,7 +556,7 @@ if [ -n "${TODAY}" ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
-                printf '%s backup today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "(${TODAYS_DATE})" "${tm_mount_point}" "${TODAYS_BACKUPS}"
+                printf '%s backup today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             else
                 printf '%s backups today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             fi
