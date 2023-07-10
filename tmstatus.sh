@@ -309,7 +309,7 @@ EOF
 
         printf 'Local oldest:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
 
-        DATE="$(echo "${LOCALSNAPSHOTDATES}" | sed -n 2p)"
+        DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 )"
         days="$(days_since "${DATE}")"
         DAYS_AGO="$(format_days_ago "${days}")"
         BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
