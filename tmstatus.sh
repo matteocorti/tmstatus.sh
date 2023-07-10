@@ -232,9 +232,9 @@ EOF
             else
 
                 printf 'Time Machine (%s):\n' "${KIND}"
-                printf 'Oldest:\t\toffline\n'
-                printf 'Last:\t\toffline\n'
-                printf 'Number:\t\toffline\n'
+                printf '  Oldest:\toffline\n'
+                printf '  Last:\toffline\n'
+                printf '  Number:\toffline\n'
 
                 # shellcheck disable=SC2030
                 OFFLINE=1
@@ -262,7 +262,7 @@ EOF
             days="$(days_since "${DATE}")"
             backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
             DAYS_AGO="$(format_days_ago "${days}")"
-            printf '  Oldest:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+            printf '  Oldest:\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
             LATESTBACKUP="$(tmutil latestbackup)"
             if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
@@ -277,7 +277,7 @@ EOF
             fi
 
             number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
-            printf '  Number:\t\t%s\n' "${number}"
+            printf '  Number:\t%s\n' "${number}"
 
             # shellcheck disable=SC2030
             FOUND=1
