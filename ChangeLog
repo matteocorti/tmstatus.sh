@@ -1,3 +1,7 @@
+2023-07-17  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: show the size of todays backups
+
 2023-07-10  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: Fixed the time difference by the last local backup

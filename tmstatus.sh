@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.15.0
+VERSION=1.16.0
 
 export LC_ALL=C
 
@@ -309,7 +309,7 @@ EOF
 
         printf '  Local oldest:\t%s (%s)\n' "${BACKUP_DATE}" "${DAYS_AGO}"
 
-        DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 )"
+        DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1)"
         days="$(days_since "${DATE}")"
         DAYS_AGO="$(format_days_ago "${days}")"
         BACKUP_DATE="$(echo "${LOCALSNAPSHOTDATES}" | tail -n 1 | sed 's/.*\///' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')"
@@ -332,8 +332,8 @@ if [ -n "${SHOWLOG}" ] || [ -n "${SHOW_SPEED}" ] || [ -n "${PROGRESS}" ]; then
 
     printf "Reading the logs..."
 
-    # per default TM runs each hour: check the last 60 minutes
-    LOG_LAST='--last 60m'
+    # check the last day for today's backups sizes
+    LOG_LAST='--last 3600m'
     # shellcheck disable=SC2086
     LOG_ENTRIES=$(log show ${LOG_LAST} --color none --predicate 'subsystem == "com.apple.TimeMachine"' --info)
 
@@ -538,19 +538,31 @@ if [ -n "${TODAY}" ]; then
 
     TODAYS_DATE="$(date +"%Y-%m-%d")"
 
-    if tmutil destinationinfo | grep -q '^Mount Point' ; then
+    if tmutil destinationinfo | grep -q '^Mount Point'; then
         echo
     fi
-    
+
     tmutil destinationinfo | grep '^Mount Point' | sed -e 's/.*: //' | while read -r tm_mount_point; do
 
         LISTBACKUPS=$(tmutil listbackups -d "${tm_mount_point}" 2>&1)
         TODAYS_BACKUPS=$(echo "${LISTBACKUPS}" | grep "${TODAYS_DATE}" | sed -e 's/.*\///' -e 's/\.backup//' -e 's/.*\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/')
 
+        if [ -n "${LOG_ENTRIES}" ]; then
+
+            # Information on backup size: https://eclecticlight.co/2021/04/09/time-machine-to-apfs-how-efficient-are-backups/
+            for b in ${TODAYS_BACKUPS}; do
+                # the log entry could also be a minute before. It is not accurate but we remove the last digit (could always be wrong if ending with 0 but better than nothing)
+                b_short=$(echo "${b}" | sed 's/[0-9]$//')
+                b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Files Copied' | sed -e 's/.*p: //' -e 's/).*//')
+                TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | sed "s/${b}/${b} (${b_size})/")
+            done
+
+        fi
+
         # without the grep ':' there is always one line (empty)
         NUMBER_OF_TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | grep -c ':' | sed 's/[ ]//g')
 
-        TODAYS_BACKUPS=$( echo "${TODAYS_BACKUPS}" | tr '\n' ',' | sed 's/,/, /g' | sed 's/, $//' )
+        TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | tr '\n' ',' | sed 's/,/, /g' | sed 's/, $//')
 
         if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 0 ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""

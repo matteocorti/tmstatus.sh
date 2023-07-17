@@ -1,1 +1,1 @@
-Show information for all the disks (```--all``` option)
+Show the size of todays backups

@@ -1,3 +1,5 @@
+* 2023-07-17. Version 1.16.0
+ * Show the size of todays backups
 * 2023-07-07, Versiom 1.15.0
  * Show information for all the disks (```--all``` option)
 * 2023-06-27, Version 1.14.0
