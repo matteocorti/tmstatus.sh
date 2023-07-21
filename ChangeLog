@@ -1,3 +1,7 @@
+2023-07-21  Matteo Corti  <matteo@corti.li>
+
+        * tmstatus.sh: Corrected the size of the last backups (same values as Backup Loupe)
+
 2023-07-17  Matteo Corti  <matteo@corti.li>
 
         * tmstatus.sh: show the size of todays backups

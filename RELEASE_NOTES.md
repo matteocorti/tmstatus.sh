@@ -1,1 +1,1 @@
-Show the size of todays backups
+Corrected the sizes of today's backups

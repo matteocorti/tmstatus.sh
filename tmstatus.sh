@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.16.0
+VERSION=1.17.0
 
 export LC_ALL=C
 
@@ -453,6 +453,9 @@ if echo "${status}" | grep -q 'BackupPhase'; then
             percent='100%'
         elif echo "${percent}" | grep -q 'FractionDone = 0'; then
             percent='0%'
+        elif echo "${percent}" | grep -q '^0'; then
+            # remove the leading 0
+            percent=$( echo "${percent}" | sed 's/^0//' )
         fi
         printf 'Percent:\t%s\n' "${percent}"
 
@@ -553,7 +556,7 @@ if [ -n "${TODAY}" ]; then
             for b in ${TODAYS_BACKUPS}; do
                 # the log entry could also be a minute before. It is not accurate but we remove the last digit (could always be wrong if ending with 0 but better than nothing)
                 b_short=$(echo "${b}" | sed 's/[0-9]$//')
-                b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Files Copied' | sed -e 's/.*p: //' -e 's/).*//')
+                b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Total Items Added' | sed -e 's/.*p: //' -e 's/).*//')
                 TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | sed "s/${b}/${b} (${b_size})/")
             done
 
