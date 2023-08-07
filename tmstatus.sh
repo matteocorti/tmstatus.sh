@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.17.0
+VERSION=1.18.0
 
 export LC_ALL=C
 
@@ -264,7 +264,7 @@ EOF
             DAYS_AGO="$(format_days_ago "${days}")"
             printf '  Oldest:\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
-            LATESTBACKUP="$(tmutil latestbackup)"
+            LATESTBACKUP="$(tmutil latestbackup -d "${tm_mount_point}")"
             if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
                 # a date was returned (should implement a better test)
                 DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"

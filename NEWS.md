@@ -1,3 +1,5 @@
+* 2023-08-07, Version 1.18.0
+ * Corrected the timestamp of the latest backup with multiple destinations
 * 2023-07-21, Version 1.17.0
  * Corrected the sizes of today's backups
 * 2023-07-17. Version 1.16.0
