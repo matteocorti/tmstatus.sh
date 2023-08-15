@@ -1,1 +1,1 @@
-Corrected the timestamp of the latest backup with multiple destinations
+Corrected the output of ```--today``` when two backups are too near to each other

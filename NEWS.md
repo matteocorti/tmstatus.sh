@@ -1,10 +1,12 @@
+* 2023-08-15, Version 1.19.0
+ * Corrected the output of ```--today``` when two backups are too near to each other
 * 2023-08-07, Version 1.18.0
  * Corrected the timestamp of the latest backup with multiple destinations
 * 2023-07-21, Version 1.17.0
  * Corrected the sizes of today's backups
 * 2023-07-17. Version 1.16.0
  * Show the size of todays backups
-* 2023-07-07, Versiom 1.15.0
+* 2023-07-07, Version 1.15.0
  * Show information for all the disks (```--all``` option)
 * 2023-06-27, Version 1.14.0
  * Parsing of destinationinfo with more than one destination
