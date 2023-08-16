@@ -559,9 +559,25 @@ if [ -n "${TODAY}" ]; then
                 b_short=$(echo "${b}" | sed 's/[0-9]$//')
                 b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Total Items Added' | tail -n 1 | sed -e 's/.*p: //' -e 's/).*//')
 
+                # size alignment
+                
                 # add .00 if the the number is round for a better alignment
-                if echo "${b_size}" | grep -q '^[0-9] GB' ; then
-                    b_size=$( echo "${b_size}" | sed 's/ GB/.00 GB/' )
+                if echo "${b_size}" | grep -q '^[0-9] .B' ; then
+                    b_size=$( echo "${b_size}" | sed 's/ \(.\)B/.00 \1B/' )
+                fi
+                
+                # add a decimal 0 if the number has only one decimal digit
+                if echo "${b_size}" | grep -q '\.[0-9] .B' ; then
+                    b_size=$( echo "${b_size}" | sed 's/\.\([0-9]\) \(.\)B/.\10 \2B/' )
+                fi
+
+                # pad to three digits
+                if echo "${b_size}" | grep -q '^[0-9]\.' ; then
+                    b_size="  ${b_size}"
+                fi
+                # pad to three digits
+                if echo "${b_size}" | grep -q '^[0-9][0-9]\.' ; then
+                    b_size=" ${b_size}"
                 fi
                 
                 TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | sed "s/${b}/${b} (${b_size})/")
