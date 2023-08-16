@@ -557,7 +557,12 @@ if [ -n "${TODAY}" ]; then
 
                 # the log entry could also be a minute before. It is not accurate but we remove the last digit (could always be wrong if ending with 0 but better than nothing)
                 b_short=$(echo "${b}" | sed 's/[0-9]$//')
-                                b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Total Items Added' | tail -n 1 | sed -e 's/.*p: //' -e 's/).*//')
+                b_size=$(echo "${LOG_ENTRIES}" | grep -A 10 "${TODAYS_DATE} ${b_short}" | grep -A 10 'Finished copying from' | grep 'Total Items Added' | tail -n 1 | sed -e 's/.*p: //' -e 's/).*//')
+
+                # add .00 if the the number is round for a better alignment
+                if echo "${b_size}" | grep -q '^[0-9] GB' ; then
+                    b_size=$( echo "${b_size}" | sed 's/ GB/.00 GB/' )
+                fi
                 
                 TODAYS_BACKUPS=$(echo "${TODAYS_BACKUPS}" | sed "s/${b}/${b} (${b_size})/")
             done
@@ -573,9 +578,9 @@ if [ -n "${TODAY}" ]; then
             echo "${NUMBER_OF_TODAYS_BACKUPS} backups today (${TODAYS_DATE}) on \"${tm_mount_point}\""
         else
             if [ "${NUMBER_OF_TODAYS_BACKUPS}" -eq 1 ]; then
-                printf '%s backup today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
+                printf '%s backup today (%s) on "%s"\tat %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             else
-                printf '%s backups today (%s) on "%s" at %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
+                printf '%s backups today (%s) on "%s"\tat %s\n' "${NUMBER_OF_TODAYS_BACKUPS}" "${TODAYS_DATE}" "${tm_mount_point}" "${TODAYS_BACKUPS}"
             fi
         fi
 

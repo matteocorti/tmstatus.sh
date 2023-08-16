@@ -1,3 +1,4 @@
+ * Align today's backups
 * 2023-08-15, Version 1.19.0
  * Corrected the output of ```--today``` when two backups are too near to each other
 * 2023-08-07, Version 1.18.0
