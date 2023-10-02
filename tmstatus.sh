@@ -467,7 +467,7 @@ else
 
 fi
 
-if [ -n "${SHOW_SPEED}" ]; then
+if echo "${status}" | grep -qi copying &&  [ -n "${SHOW_SPEED}" ]; then
 
     SPEED=$(
         echo "${LOG_ENTRIES}" |
