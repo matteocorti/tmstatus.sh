@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.19.0
+VERSION=1.20.0
 
 export LC_ALL=C
 
@@ -478,15 +478,21 @@ if echo "${status}" | grep -qi copying &&  [ -n "${SHOW_SPEED}" ]; then
 
     if [ -n "${SPEED}" ]; then
         if ! echo "${SPEED}" | grep -q -- '-, '; then
-            PERC_PER_SECOND=$(echo "${SPEED}" | sed 's/%\/s.*//')
-            PERC_PER_MINUTE=$(echo "scale=2;${PERC_PER_SECOND}*60" | bc)
-            if [ -n "${PERC_PER_MINUTE}" ]; then
-                if echo "${PERC_PER_MINUTE}" | grep -q '^[.]'; then
-                    PERC_PER_MINUTE=$(echo "${PERC_PER_MINUTE}" | sed 's/\([.][0-9]\)\(.*\)/\1/')
-                    PERC_PER_MINUTE=" (0${PERC_PER_MINUTE} %/min)"
+
+            if echo "${SPEED}" | grep -q '%\/s'; then            
+                PERC_PER_SECOND=$(echo "${SPEED}" | sed 's/%\/s.*//')            
+                PERC_PER_HOUR=$(echo "scale=2;${PERC_PER_SECOND}*3600" | bc)
+            elif echo "${SPEED}" | grep -q '%\/h'; then
+                PERC_PER_HOUR=$(echo "${SPEED}" | sed 's/%\/h.*//')            
+            fi
+            
+            if [ -n "${PERC_PER_HOUR}" ]; then
+                if echo "${PERC_PER_HOUR}" | grep -q '^[.]'; then
+                    PERC_PER_HOUR=$(echo "${PERC_PER_HOUR}" | sed 's/\([.][0-9]\)\(.*\)/\1/')
+                    PERC_PER_HOUR=" (0${PERC_PER_HOUR} %/h)"
                 else
-                    PERC_PER_MINUTE=$(echo "${PERC_PER_MINUTE}" | sed 's/[.].*//')
-                    PERC_PER_MINUTE=" (${PERC_PER_MINUTE} %/min)"
+                    PERC_PER_HOUR=$(echo "${PERC_PER_HOUR}" | sed 's/[.].*//')
+                    PERC_PER_HOUR=" (${PERC_PER_HOUR} %/h)"
                 fi
             fi
         fi
@@ -512,7 +518,7 @@ if echo "${status}" | grep '_raw_Percent' | grep -q -v '[0-9]e-'; then
     else
         percent=$(echo "${status}" | grep '_raw_Percent" = "0' | sed 's/.*[.]//' | sed 's/\([0-9][0-9]\)\([0-9]\).*/\1.\2%/' | sed 's/^0//')
     fi
-    printf 'Percent:\t%s%s\n' "${percent}" "${PERC_PER_MINUTE}"
+    printf 'Percent:\t%s%s\n' "${percent}" "${PERC_PER_HOUR}"
 
     raw_percent=$(echo "${status}" | grep '_raw_Percent' | sed 's/.*\ =\ "//' | sed 's/".*//')
 

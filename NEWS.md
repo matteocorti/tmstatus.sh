@@ -1,3 +1,5 @@
+* 2023-10-03, Version 1.20.0
+ * Corrected the speed parsing on Sonoma
  * Align today's backups
 * 2023-08-15, Version 1.19.0
  * Corrected the output of ```--today``` when two backups are too near to each other
