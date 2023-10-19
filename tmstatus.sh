@@ -12,7 +12,7 @@
 #
 
 # shellcheck disable=SC2034
-VERSION=1.20.0
+VERSION=1.21.0
 
 export LC_ALL=C
 
@@ -243,8 +243,20 @@ EOF
 
         elif echo "${LISTBACKUPS}" | grep -q 'No backups found for host.'; then
 
-            printf 'Time Machine: no backups found\n'
+            tm_total=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_available=$(df -H "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
 
+            tm_total_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $2 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_available_raw=$(df "${tm_mount_point}" 2>/dev/null | tail -n 1 | awk '{ print $4 "\t" }' | sed 's/[[:blank:]]//g')
+            tm_percent_available=$(echo "${tm_available_raw} * 100 / ${tm_total_raw}" | bc)
+
+            printf '\nVolume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
+
+                # no backups yet
+                printf '  Oldest:\t-\n'
+                printf '  Last:\t\t-\n'
+                printf '  Number:\t0\n'
+                
         else
 
             # sometimes df on network volumes throws a 'df: getattrlist failed: Permission denied' error but delivers
@@ -259,25 +271,37 @@ EOF
             printf '\nVolume (%s) "%s": %s (%s available, %s%%)\n' "${KIND}" "${tm_mount_point}" "${tm_total}" "${tm_available}" "${tm_percent_available}"
 
             DATE="$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//')"
-            days="$(days_since "${DATE}")"
-            backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-            DAYS_AGO="$(format_days_ago "${days}")"
-            printf '  Oldest:\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
 
-            LATESTBACKUP="$(tmutil latestbackup -d "${tm_mount_point}")"
-            if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
-                # a date was returned (should implement a better test)
-                DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
-                days=$(days_since "${DATE}")
-                backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
-                DAYS_AGO="$(format_days_ago "${days}")"
-                printf '  Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+            if echo "${DATE}" | grep -q 'No machine directory' ; then
+
+                # no backups yet
+                printf '  Oldest:\t-\n'
+                printf '  Last:\t\t-\n'
+                printf '  Number:\t0\n'
+
             else
-                printf '  Last:\t\t%s\n' "${LATESTBACKUP}"
-            fi
+            
+                days="$(days_since "${DATE}")"
+                backup_date=$(echo "${LISTBACKUPS}" | head -n 1 | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+                DAYS_AGO="$(format_days_ago "${days}")"
+                printf '  Oldest:\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+                
+                LATESTBACKUP="$(tmutil latestbackup -d "${tm_mount_point}")"
+                if echo "${LATESTBACKUP}" | grep -q '[0-9]'; then
+                    # a date was returned (should implement a better test)
+                    DATE="$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//')"
+                    days=$(days_since "${DATE}")
+                    backup_date=$(echo "${LATESTBACKUP}" | sed 's/.*\///' | sed 's/[.].*//' | sed 's/-\([^\-]*\)$/\ \1/' | sed 's/\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1:\2:\3/')
+                    DAYS_AGO="$(format_days_ago "${days}")"
+                    printf '  Last:\t\t%s (%s)\n' "${backup_date}" "${DAYS_AGO}"
+                else
+                    printf '  Last:\t\t%s\n' "${LATESTBACKUP}"
+                fi
 
-            number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
-            printf '  Number:\t%s\n' "${number}"
+                number=$(echo "${LISTBACKUPS}" | wc -l | sed 's/\ //g')
+                printf '  Number:\t%s\n' "${number}"
+                
+            fi
 
             # shellcheck disable=SC2030
             FOUND=1

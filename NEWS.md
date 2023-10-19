@@ -1,3 +1,5 @@
+* 2023-10-19, Version 1.21.0
+ * Handling of empty Time Machine disks (no backups yet)
 * 2023-10-03, Version 1.20.0
  * Corrected the speed parsing on Sonoma
  * Align today's backups
