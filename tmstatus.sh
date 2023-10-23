@@ -483,6 +483,22 @@ if echo "${status}" | grep -q 'BackupPhase'; then
         fi
         printf 'Percent:\t%s\n' "${percent}"
 
+    elif echo "${status}" | grep -q Thinning; then
+
+        if [ -n "${LOG_ENTRIES}" ]; then
+
+            # find the last log entry about deletion
+            LOG_ENTRY=$( echo "${LOG_ENTRIES}" | grep 'ready for deletion' | tail -n 1 | sed 's/Info.*/Info/' ) # | tail -n 1 | sed 's/Info.*//' )
+
+            # fetch the next lines after this last entry and grep the backup entries
+            THINNING_TO_DELETE=$( echo "${LOG_ENTRIES}" | grep -A 100 "${LOG_ENTRY}" | grep -c APFSBackup: )
+            
+            THINNING_DELETED=$( echo "${LOG_ENTRIES}" | grep -A 10000 "${LOG_ENTRY}" | grep -c 'Deleted incomplete' )
+
+            printf '\t\t%s out of %s deleted\n' "${THINNING_DELETED}" "${THINNING_TO_DELETE}"
+
+        fi
+
     fi
 
 else
